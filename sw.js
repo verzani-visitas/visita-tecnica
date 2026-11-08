@@ -1,5 +1,5 @@
 /* Visita Técnica — funcionamento sem internet */
-const VERSAO = "vt-1.0.3";
+const VERSAO = "vt-1.0.4";
 const ARQUIVOS = [
   "./",
   "index.html",
