@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B3D4C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Visita Técnica">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Visita Técnica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: prancheta de campo — cabeçalho fixo com etapas, uma coluna de cartões, barra de ação no rodapé */
+:root{
+  --bg:#EEF2F5; --surface:#FFFFFF; --sunk:#F5F7F9; --ink:#16222E; --muted:#5A6977; --line:#D3DBE2;
+  --brand:#0B3D4C; --brand-ink:#FFFFFF; --accent:#D4531C; --accent-ink:#FFFFFF;
+  --ok:#2D7A4C; --ok-bg:#E3F2E8; --warn:#9A5B12; --warn-bg:#FCF0DA; --err:#B3261E; --err-bg:#FBE5E3;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E151C; --surface:#17212B; --sunk:#121A22; --ink:#E5EBF0; --muted:#94A3B0; --line:#2A3743;
+  --brand:#3FAAB3; --brand-ink:#0B151A; --accent:#F07A45; --accent-ink:#1A0E08;
+  --ok:#6CC28F; --ok-bg:#163223; --warn:#E9B062; --warn-bg:#33270F; --err:#F08A80; --err-bg:#3A1714; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E151C; --surface:#17212B; --sunk:#121A22; --ink:#E5EBF0; --muted:#94A3B0; --line:#2A3743;
+  --brand:#3FAAB3; --brand-ink:#0B151A; --accent:#F07A45; --accent-ink:#1A0E08;
+  --ok:#6CC28F; --ok-bg:#163223; --warn:#E9B062; --warn-bg:#33270F; --err:#F08A80; --err-bg:#3A1714; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+.hbtns{display:flex;gap:6px;flex:0 0 auto}
+.hbtn{border:1px solid rgba(255,255,255,.35);background:transparent;color:inherit;font:600 12.5px/1 var(--f-body);padding:8px 8px;border-radius:8px;cursor:pointer}
+.hbtn[aria-pressed="true"]{background:rgba(255,255,255,.16)}
+.hbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.capa{min-height:100vh;min-height:100dvh;background:linear-gradient(165deg,#0B3D4C 0%,#082D38 62%,#06222B 100%);color:#fff;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.capa::before{content:"";position:absolute;right:-90px;top:-90px;width:300px;height:300px;border-radius:44px;transform:rotate(45deg);border:28px solid rgba(0,160,168,.18)}
+.capa::after{content:"";position:absolute;left:-120px;bottom:120px;width:240px;height:240px;border-radius:36px;transform:rotate(45deg);border:22px solid rgba(232,88,32,.14)}
+.capa-in{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;gap:22px;max-width:520px;width:100%;margin:0 auto;padding-block:28px 22px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.capa-logo{background:#fff;border-radius:16px;padding:14px 18px;align-self:flex-start;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.capa-logo img{height:52px;width:auto;display:block}
+.capa h1{font-family:var(--f-display);font-size:46px;line-height:.98;margin:18px 0 0;letter-spacing:.01em;text-transform:uppercase;text-wrap:balance}
+.capa h1 em{font-style:normal;color:#F07A45}
+.capa .tag{font-family:var(--f-body);color:#fff;margin:8px 0 0;font-size:16px;opacity:.82;max-width:34ch}
+.capa .faixa{display:flex;height:5px;border-radius:3px;overflow:hidden;width:120px}
+.capa .faixa i{flex:2;background:#00A0A8}.capa .faixa b{flex:1;background:#E85820}
+.capa-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.capa-stats div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px}
+.capa-stats b{display:block;font-family:var(--f-mono);font-size:22px}
+.capa-stats span{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.75;font-weight:600}
+.capa-acoes{display:grid;gap:10px;margin-top:auto}
+.capa-acoes .btn{width:100%;padding:16px;font-size:16px;border-radius:12px}
+.capa-acoes .btn.claro{flex-direction:column;gap:2px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28);color:#fff}
+.capa-acoes .btn.claro small{display:block;font-weight:500;opacity:.75;font-size:13px;margin-top:3px}
+.capa-acoes .lado{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.capa-rod{font-size:12.5px;opacity:.6;text-align:center}
+.vcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
+.vcard h3{margin:0;font-family:var(--f-display);font-size:19px;line-height:1.15}
+.vmeta{color:var(--muted);font-size:14px}
+.vrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill.err{background:var(--err-bg);color:var(--err);border-color:transparent}
+.pill.info{background:var(--sunk)}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--brand)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--brand);color:var(--brand-ink)}
+header.top .wrap{padding-block:12px 0}
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brandrow h1{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.02em;margin:0;text-transform:uppercase;line-height:1.1}
+.brandrow small{display:block;font-family:var(--f-body);font-weight:500;font-size:13px;opacity:.85;text-transform:none;letter-spacing:0}
+.save-ind{font-size:12px;opacity:.85;white-space:nowrap}
+nav.steps{display:flex;gap:4px;overflow-x:auto;padding-block:12px 0;scrollbar-width:none}
+nav.steps::-webkit-scrollbar{display:none}
+nav.steps button{flex:0 0 auto;border:0;background:transparent;color:inherit;opacity:.72;font:600 14px/1 var(--f-body);padding:10px 10px 12px;border-bottom:3px solid transparent;cursor:pointer;display:flex;gap:6px;align-items:center}
+nav.steps button .n{font-family:var(--f-mono);font-size:12px;width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;border:1.5px solid currentColor}
+nav.steps button[aria-current="step"]{opacity:1;border-bottom-color:var(--accent)}
+nav.steps button[aria-current="step"] .n{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+nav.steps button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+main{padding-block:20px 120px}
+.stephead{margin-bottom:16px}
+.stephead h2{font-family:var(--f-display);font-size:28px;margin:0;text-wrap:balance;line-height:1.1}
+.stephead p{margin:4px 0 0;color:var(--muted);max-width:62ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:14px}
+.stack{display:grid;gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}.grid3.keep{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.f{display:grid;gap:5px;min-width:0}
+.f>span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.f>span em{font-style:normal;color:var(--err)}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:0;border-color:var(--brand)}
+.sec-title{font-family:var(--f-display);font-size:19px;margin:6px 0 0;letter-spacing:.01em}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-block;padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;font-weight:600;font-size:14px;cursor:pointer;background:var(--surface);user-select:none}
+.chip input:checked+span{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.chip input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 16px;display:grid;gap:12px}
+.item-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.item-head b{font-family:var(--f-display);font-size:18px}
+.tag{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.btn{font:600 15px/1 var(--f-body);border-radius:8px;padding:12px 16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;gap:8px;align-items:center;justify-content:center}
+.btn:hover{border-color:var(--brand)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.brand{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted);padding:8px 10px}
+.btn.ghost:hover{color:var(--err)}
+.btn.add{border-style:dashed;width:100%;color:var(--brand)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.calc{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);color:var(--muted)}
+.pill.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.pill.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.note{border-radius:8px;padding:12px 14px;font-size:14.5px;display:grid;gap:4px}
+.note.warn{background:var(--warn-bg);color:var(--warn)}
+.note.ok{background:var(--ok-bg);color:var(--ok)}
+.note.err{background:var(--err-bg);color:var(--err)}
+.note.info{background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.note b{color:inherit}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.ph{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--sunk);border:1px solid var(--line);max-width:100%}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph button{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:15px;line-height:1;cursor:pointer}
+.ph-add{aspect-ratio:1;border:1.5px dashed var(--line);border-radius:8px;display:grid;place-items:center;text-align:center;color:var(--brand);font-weight:600;font-size:13px;cursor:pointer;padding:6px;background:var(--surface)}
+.ph-add input{display:none}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:var(--r);padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;font-size:14.5px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.tile b{display:block;font-family:var(--f-mono);font-size:22px;font-variant-numeric:tabular-nums}
+.tile span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.rcpt{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.rcpt:last-child{border-bottom:0}
+.rcpt label{display:flex;gap:10px;align-items:center;flex:1;min-width:0;cursor:pointer}
+.rcpt input[type=checkbox]{width:20px;height:20px;flex:0 0 auto;accent-color:var(--brand)}
+.rcpt .who{min-width:0;overflow-wrap:anywhere}
+.rcpt .who small{display:block;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1 1 160px}
+.actions{display:grid;gap:10px}
+.sig{border:1px solid var(--line);border-radius:8px;background:#fff;touch-action:none;width:100%;height:160px;display:block}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:6;padding-bottom:env(safe-area-inset-bottom,0px)}
+footer.bar .wrap{display:flex;gap:10px;padding-block:12px}
+footer.bar .btn{flex:1}
+.status{margin-top:4px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.check-list{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.cb{display:flex;gap:10px;align-items:flex-start;font-size:15px;cursor:pointer}
+.cb input{width:20px;height:20px;margin-top:1px;flex:0 0 auto;accent-color:var(--brand)}
+@media (prefers-reduced-motion:no-preference){.step-enter{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<div id="capa" hidden></div>
+<header class="top">
+  <div class="wrap">
+    <div class="brandrow">
+      <h1>Visita técnica<small id="hdrSub">Pré-proposta · Verzani & Sandrini</small></h1>
+      <div class="hbtns"><button class="hbtn" type="button" id="hInicio">Início</button><button class="hbtn" type="button" id="hVisitas">Visitas</button><button class="hbtn" type="button" id="hAjustes">Ajustes</button></div>
+    </div>
+    <div class="save-ind" id="saveInd" style="padding-top:6px">Salvo neste aparelho</div>
+    <nav class="steps" id="steps" aria-label="Etapas da visita"></nav>
+  </div>
+</header>
+<main class="wrap" id="main"></main>
+<footer class="bar" id="bar"><div class="wrap">
+  <button class="btn" id="btnPrev" type="button">Voltar</button>
+  <button class="btn brand" id="btnNext" type="button">Próximo</button>
+</div></footer>
+
+<datalist id="dl-cargos"></datalist>
+<datalist id="dl-equip"></datalist>
+
+<script src="libs/jspdf.umd.min.js"></script>
+<script src="libs/jspdf.plugin.autotable.min.js"></script>
+<script src="libs/xlsx.full.min.js"></script>
+<script>
+"use strict";
+const EQUIP = ["800 Tennant Diesel 1 Esc Lat Varr Cabine Com Ar Condicionado - Alfa Tennant", "800 Tennant Diesel 1 Esc Lat Varr Sem Cabine Para Operador (Sob Encomenda) - Alfa Tennant", "A135 Alfa 220V - Alfa Tennant", "A140 Alfa (Agm Optima) - Alfa Tennant", "A140 Alfa Agm + Jogo Extra De Bateria - Alfa Tennant", "A260/A250 Alfa Bateria - Alfa Tennant", "A300 Alfa Bateria (Sob Encomenda) - Alfa Tennant", "A500 Alfa Bateria - Alfa Tennant", "A650/A670 Alfa Bateria - Alfa Tennant", "A750 Alfa Bateria - Alfa Tennant", "Adaptador 2x70L p/ Coletor 120L - Mod. S070335 - TTS", "Agua Pura + Kit 16M Alfa 220V - Alfa Tennant", "Alfa Bizz - Varredeira Manual - Alfa Tennant", "Alfa Mini Bateria Litio (Escovas) - Alfa Tennant", "Alfa Pressure 900 - Alfa Tennant", "Alfaext 52 127V Alfa 110V - Alfa Tennant", "Alfaext 52 220V Alfa 220V - Alfa Tennant", "Alfapressure 100 Alfa 110V - Alfa Tennant", "Alfapressure 100 Alfa 220V - Alfa Tennant", "Alfapressure 400 Alfa 220V - Alfa Tennant", "Alfapressure 500 Alfa 220V Trifásico - Alfa Tennant", "Alfapressure 500 Alfa380V Trifásico - Alfa Tennant", "Alfapro 18 Alfa 110V Porta Acessórios, Bocal De Sopro - Alfa Tennant", "Alfapro 18 Alfa 220V Porta Acessórios, Bocal De Sopro - Alfa Tennant", "Alfapro 52 Alfa 110V - Alfa Tennant", "Alfapro 52 Alfa 220V - Alfa Tennant", "Alfapro 62 Alfa 220V 2 Motores - Alfa Tennant", "Alfapro 89 Alfa 220V 3 Motores - Alfa Tennant", "Aplicador Bio Basic c/ Reservatório 650ml - Azul - Mod. 970", "Aplicador Ray Basic Cinza/Verde c/ base Aderente - 40cm - Capacidade de 500ml - TTS", "Armação Bendy 8882 - 60cm - TTS", "Armação Bendy BIT - 60cm (Sem Refil) - TTS", "Armação Bi Lap 8891 - TTS", "Armário Corta-Fogo - Aço Carbono - Vermelho", "Armário Corta-Fogo Standard p/ Armazenamento de Inflamáveis - 2000x1000mm - Vermelho", "Armário de Aço p/ Escritório - Fechadura - 3 Prateleiras - Mod. EA303 - Cinza", "Armário de Madeira c/ 2 Portas", "Armário Roupeiro de Aço - Vestiário Academia - 8 Portas - Locker", "Articulação Completa p/ Bio S030126 VD - TTS", "Aspersor c/ Haste p/ Irrigação de Jardim", "Aspirador Costal V-Bp-6-110V - Alfa Tennant", "Aspirador Costal V-Bp-7-220V - Alfa Tennant", "Atomizador - Mod. Guarani (Elétrico - 110V ou 220V) - 60DB", "Atomizador - Mod. Storm Motor Scrubber (Bateria) - 15DB", "Autolavadora de Piso - Mod. Nilfisk AS510B (Bateria", "Autolavadora de Piso - Mod. Nilfisk AS5160 TO (Bateria) - Orbita", "B70 Alfa Bateria 2 X 12V - Alfa Tennant", "Bac Mop - Bralimpia", "Balde 18L (Vermelho ou Azul) - TTS", "Balde 4L (Amarelo, Vermelho, Azul ou Verde) - TTS", "Balde Action Azul - 30L - Mod. B06490 - TTS", "Balde Action Azul Dry - 30L - Mod. B066490 - TTS", "Balde Amarelo - 4L", "Balde Amarelo Action 30L - TTS", "Balde Aplicador de Cera Completo - Bralimpia", "Balde de 4L c/ Graduação e Alça Plástica - Amarelo - TTS", "Balde de 4L c/ Graduação e Alça Plástica - Azul - TTS", "Balde de 4L c/ Graduação e Alça Plástica - Verde - TTS", "Balde de 4L c/ Graduação e Alça Plástica - Vermelho - TTS", "Balde Hermético s/ Tampa - Vermelho - Mod. ROO3253 - TTS", "Balde Verde - 4L - TTS", "Banheiro Químico", "Base Carregadora HT", "Bolsa Carteiro", "Borracha p/ Limpador - 35cm - Mod. 8162 - TTS", "Botão de Acionamento p/ Bio e Saniwax - Mod. S040415 - TTS", "Brava Alfa Bateria Celular (18 Celulas 2V = 36V) + Jogo Extra De Bateria - Alfa Tennant", "Brava Alfa Bateria Celular (18 Celulas 2V = 36V) - Alfa Tennant", "Cabo Alumínio 1,40m - Azul - Mod. 0B1046 - TTS", "Cabo Alumínio 1,40m c/ Manopla Azul - Mod. 0B001041 - TTS", "Cabo Alumínio Anodizado 1,40m - Verde - Mod. 1041 - TTS", "Cabo Alumínio p/ Mop Pó - 140cm - Mod. CM140", "Cabo Alumínio p/ Mop Úmido - Mod. HE211", "Cabo c/ Luva Acrílica - Bralimpia", "Cabo em Alumínio Natural - Manopla Amarela - 1,40mt - TTS", "Cabo Telescópico - 6m", "Cabo Telescópico Cinza - 1,80m - Mod. E001044 - TTS", "Cadeira Fixa", "Cadeira Giratória", "Capa de Chuva - PVC - Incolor - Tam EXG - Mod. CA28450", "Carregador de Bateria Individual - Husqvarna - Mod. QC500 - Rápido - Linha Profissional", "Carreta p/ Trator Agrícola", "Carrinho Camareira", "Carrinho de Mão Galvanizado c/ Pneumático", "Carrinho de Mão Pneumático c/ Caçamba Metal Rasa", "Carrinho Elétrico p/ Cargas - Mod. 500", "Carrinho Mensageiro", "Carrinho Plataforma de Madeira - Capacidade 500kg", "Carro Bandeja Triplex - Mod. NY103 - Bralimpia", "Carro Cuba - 600L c/ Estrutura Metálica - Mod. EM600 - Bralimpia", "Carro Cuba c/ Estrutura Metálica - Mod. EM430 - Bralimpia", "Carro de Coleta - 240L c/ Pedal - Modelo Europeu - Bralimpia", "Carro de Coleta 120L c/ Pedal - Modelo Europeu - Bralimpia", "Carro de Coleta Tipo Cuba - 430L - Bralimpia", "Carro de Coleta Tipo Cuba - 520L - Bralimpia", "Carro de Coleta Tipo Cuba - 600L - Bralimpia", "Carro de Coleta Tipo Cuba - 700L - Bralimpia", "Carro Elétrico p/ Cargas e Coleta de Resíduos", "Carro Funcional - Linha Bralimpia - Mod. 400", "Carro Funcional - Linha Bralimpia - Mod. 601", "Carro Funcional - Linha Bralimpia - Mod. 700", "Carro Funcional - Mod. 300E - Capacidade 150L - TTS", "Carro Funcional - Mod. 470E2 - TTS", "Carro Funcional Guardaz c/ Bolsa Azul - Bralimpia", "Carro Funcional Magic Grey - Mod. 300S - TTS", "Carro Funcional Magic Hotel - Mod. 420S", "Carro Funcional Magic Line - Mod. 300E - TTS", "Carro Magic Line - Mod. 300B - TTS", "Carro Moover Preto BM010N - TTS", "Carro Moover Preto BM020N - TTS", "Carro Nick Plus - Mod. 30 - TTS", "Carro Plataforma Fechado c/ Tela e Abertura Lateral - Capacidade 300kg", "Carteira p/ Aluno c/ Braço", "Cavadeira Articulada c/ Cabo de Madeira - Bellota", "Cavadeira Articulada s/ Bico (2 Cabos)", "Cavadeira Reta c/ Cabo", "Cesta Multi-Uso - Pequena - Cinza - Mod. S530345 - TTS", "Cesta Multi-Uso - Pequena - Mod. E003518 - TTS", "Cesto Hamper Smile - 120L - Mod. W004620 - TTS", "Chave p/ Porta Arm - Cinza - Mod. S070413 - TTS", "Chibanca (Machado/Enxadão) c/ Cabo", "Coletor de Grama p/ Microtrator", "Conjunto Balde c/ Espremedor Doblo - Azul - Mod. NY109 V.S", "Conjunto de Mão - 3 Peças", "Conjunto Mopinho - Azul - Mod. CM12AZ - Bralimpia", "Container p/ Combustível - 20 Litros", "Container p/ Combustível - 5 Litros", "Container p/ Combustível - 50 Litros", "Container p/ Resíduos - 1100 Litros - Clássico", "Contêiner de Lixo - JSN - Plástico c/ Rodas - 240L - Azul", "Contêiner de Lixo JSN - Plástico c/ Rodas - 120L - Azul", "Corpo p/ Articulação - Amarelo - Mod. S030121 - TTS", "Cortador de Grama - Trapp", "Cortador de Grama Flutuante", "Desktop M700 - 8GB Memória - 500GB HD", "Dosador - 3 Saídas (Diluidor de Produto Químico)", "Eco/A260 Cabo Alfa 220V - Alfa Tennant", "Enceradeira 350 Alfa 110V - Alfa Tennant", "Enceradeira 350 Alfa 220V - Alfa Tennant", "Enceradeira 400 Alfa 110V - Alfa Tennant", "Enceradeira 400 Alfa 220V - Alfa Tennant", "Enceradeira 500 Alfa 110V - Alfa Tennant", "Enceradeira 500 Alfa 220V - Alfa Tennant", "Enxada c/ Cabo - Bellota", "Enxadinha Saito Nº 13 c/ Cabo", "Enxadinha Saito Nº 17 c/ Cabo", "Enxadão c/ Cabo - Bellota", "Enxadão Largo c/ Cabo", "Equipamento de ATP (Coleta SWAB - Higiene de Superfícies)", "Escada de Alumínio - 3 Degraus - Mod. ESAL03 - Bralimpia", "Escada de Alumínio - 4 Degraus - Mod. ESAL04 - Bralimpia", "Escada de Alumínio - 5 Degraus - Mod. ESAL05 - Bralimpia", "Escada de Alumínio - 6 Degraus - Mod. ESAL06 - Bralimpia", "Escada de Alumínio - 7 Degraus - Mod. ESAL07 - Bralimpia", "Escada de Alumínio - 8 Degraus - Mod. ESAL08 - Bralimpia", "Espanador Eletrostático - Standard - Bralimpia", "Espremedor - Mod. TEC 3722 - TTS", "Estrator de Inco (Despraguejador)", "Excentr - Mod. 30-20 B", "Extensão - 30m", "Extensão - 50m", "Extensão Elétrica - Carretel - 30m - 3 Tomadas", "Extensão Telescópica - 9m - 3 Estágios - Mod. 8523 - TTS", "Extratora de Carpete - Mod. R3", "Facão 16\" c/ Cabo Plástico", "Fechadura c/ Chave p/ Porta de Armário - Mod. V350220 - TTS", "Fechadura c/ Chave p/ Porta de Coletor - Mod. V350225 - TTS", "Fio de Nylon p/ Roçadeira", "Fio de Nylon Quadrado 2,6mm - Rolo 300m", "Fixador de Cabo - Mod. S530112 - TTS", "Fixador de Cabo c/ Trava 26mm - Mod. 3326 - TTS", "Fixador de Cabo Extensível p/ Bandeja - Mod. 3325E - TTS", "Fixador de Cabo Móvel - Scout Cinza - Mod. 3319E - TTS", "Foice - Mod. Paranã c/ Cabo", "Foice Curva c/ Cabo", "Fone de Lapela PTT - Hytera - Mod. PD EHN12", "Fone de Lapela PTT p/ DGP", "Fone de Ouvido Mic e PTT - Motorola - Mod. HKLN4599B", "Fox Alfa 220V - Alfa Tennant", "Frigobar Electrolix 90L - Branco Efficiente c/ Controle de Temperatura", "Gaiola p/ Bombonas", "Gancho Simples - Mod. S030782 - TTS", "Geladeira - Electrolux - 1 Porta", "Geladeira Cycle Defrost - Electrolux - 240 Litros - Degelo Branco - Mod. RE31", "Gerador De Vapor Portátil Profissional. Até 140°C. 2,5 L Trabalho Contínuo - Alfa Tennant", "Gerador De Vapor Portátil Profissional. Vapor Até 180°C. Caldeira De 3,5 Litros Com Modo De Trabalho Contínuo - Alfa Tennant", "Giro Zero", "Giro Zero Husqvarna Z560X - Alfa Tennant", "Gloss Meter (Tratamento de Piso)", "GLP - 13kg", "GLP - 20kg", "GLP - 5kg", "GLP - 8kg", "Guarda-Chuva - 1,40m c/ Logo Grupo V&S", "I-Fiber - Conjunto c/ 5 Microfibras (Higiene de Superfícies", "I-Fibre (Fibra)", "I-Light", "I-Mop Lite - Alfa Tennant", "I-Scrub 26 H", "I-Scrub 30 - A Bateria", "I-Scrub 30 - Elétrico", "I-Suit", "Impressora Multifuncional - Mod. E52645 + 400 Impressões/Mês", "Impressora Multifuncional - Mod. E52645 + 800 Impressões/Mês", "Impressora Térmica / Etiquetadora", "Internet Fixa a Cabo - 1G", "Internet Fixa a Cabo - Até 700 Mbps", "Kit Essencial 1- Limpeza Molhada - TTS", "Kit Essencial 2 - Limpeza úmida - TTS", "Kit Jardinagem", "Kit Limpa Vidro c/ Extensor - 4,5m", "Kit Limpador de Escada Rolante - ESCATEQ (Tread/Riser/Rail TEQ)", "Kit Limpeza em Altura", "Kit Prateleira Arm Magic - Mod. T590850 - TTS", "Kit Prateleiras (Tipo Montável)", "Kit Storm - A Bateria", "Lanterna - 5 LEDs - Recarregável", "Lanterna de UV + Gel/Caneta (Higiene de Superfícies)", "Lanterna Recarregável - LED", "Lav Aut Piso Alfa Mini C/ Prop (Escovas) - Alfa Tennant", "Lava e Seca - 11kg - Samsung", "Lavadora - Mod. I Caddy Clean / I-Scrub 21B", "Lavadora Alta Pressão - Mod. HD 6/15 Cage - 220V - Karcher", "Lavadora Alta Pressão - Água Fria - Karcher - Mod. HD 10/25 (220/380/440V - Trifásico)", "Lavadora Alta Pressão - Água Fria - Karcher - Mod. HD 7/13 Maxi (220V - Monofásico)", "Lavadora Alta Pressão - Água Quente - Karcher - Mod. HDS 8/15 Cage", "Lavadora de Vidros - Água Pura + Kit 16mts", "Lavadora de Vidros e Superfícies - Mod. WVP10", "Lavadora DRYFT - 1 Bateria - Osprey Brasil", "Lavadora DRYFT - 2 Baterias - Osprey Brasil", "Lavadora Escada Rolante Eureka Escalator - Alfa Tennant", "Lavadora I-Mop Lite - Locação (12 Meses)", "Lavadora I-Mop XXL - Locação (12 Meses)", "Lavadora Manual de Piso - Mod. I", "Lima Chata p/ Enxada - 8\"", "Lima KF c/ Cabo", "Limpador Inox c/ Mola - 35cm - Mod. 8052 - TTS", "Limpadora de Piso Compacta - Karcher BR 30/4 - c/ Bateria", "Limpadora de Piso Compacta - Karcher BR 30/4 - Elétrica", "Locação de Caçamba de Entulhos", "Logo", "Luva Acrílica - Bralimpia", "Luva p/ Lavador - 35cm - Mod. 8411 - TTS", "Luz UVC p/ Superfícies e Ar (Modular - Elétrico)", "M20 Tennant Glp 1 Esc Lat Lav Com Protetor Do Operador - Alfa Tennant", "Magic Line - Mod. Moover", "Mangueira p/ Jardim - 20m", "Mangueira p/ Jardim - 50m", "Mangueira Reforçada p/ Jardim - 1/2\" - 100m", "Mangueira Silicone p/ Bio - Mod. S040412 - TTS", "Marmiteiro - Banho Maria - Grande", "Mesa c/ 3 Gavetas", "Mesa Refeitório - 6 Lugares", "Mesa Reunião - Redonda", "Micro Lavadora de Piso - Mod. FORCE - Motor Scrubber c/ Aspiração", "Micro Lavadora de Piso - Mod. JET3 - Motor Scrubber", "Micro Lavadora de Piso - Mod. SHOCK - Motor Scrubber - Sistema Orbital", "Micro-Ondas - Philco - Branco - 32L - 110V", "Microfone Auto Falante Remoto - Mod. PMMN4013", "Mini Magic 10P - Composto - 1 Coletor 150L - TTS", "Mola p/ Articulação do Bio - Mod. H110051 - TTS", "Mop Pó Acrílico - 120cm - Azul - Mod. RP1200", "Mop Pó Acrílico - 40cm - Azul - Mod. RP400", "Mop Pó Acrílico - 60cm - Azul - Mod. RP600", "Mop Pó Acrílico - 61x14cm - Mod. BR000241 - TTS", "Mop Pó Acrílico 40x12cm - TTS", "Mop Água - 11776 - 300g c/ Fita Azul - TTS", "Mop Água - Algodão c/ Fita Amarela - Ponta Dobrada - TTS", "Mop Úmido - Algodão 30cm (Mopita) - Azul - Mod. BR32AZ", "Mop Úmido Scrubber - 49x14cm - Azul - Mod. SM49AZ", "Motocicleta Bros 160 - Honda", "MotorScrubber - Mod. MSJET3EU", "Máquina de Lavar Roupa - 12kg", "Máquina de Lavar Semi-Automática - Suggar Turbilhão Max - 7kg - Branca - 127V", "Máquina Secadora de Roupa - 11,2kg", "Nexti - Percapta", "Nexti - Terminal Biométrico", "Nexti - Terminal Facial", "Notebook Lenovo - Mod. E14 - 8GB Memória - 500GB HD", "NÃO UTILIZAR - Auto Lavadora de Piso", "NÃO UTILIZAR - Auto Lavadora de Piso - XL Plus Blue - Pro V22", "NÃO UTILIZAR - Bateria Caddy Clean - Osprey Brasil", "NÃO UTILIZAR - Bateria Extra - I-Mop", "NÃO UTILIZAR - Bateria I-MOP (PAR) - Osprey Brasil", "NÃO UTILIZAR - Bateria I-MOP Lite - Osprey Brasil", "NÃO UTILIZAR - Carregador Caddy Clean - Osprey Brasil", "NÃO UTILIZAR - Carregador I-MOP - Osprey Brasil", "NÃO UTILIZAR - Excentr - Mod. 40-25 - Osprey Brasil", "NÃO UTILIZAR - EXCENTR 40-25 - Osprey Brasil", "Não Utilizar - Extensão Telescópica - 3x3,0m - Mod. 8523 - TTS", "NÃO UTILIZAR - HAAGA 677 - Osprey Brasil", "NÃO UTILIZAR - I Brush - Osprey Brasil", "NÃO UTILIZAR - I CADDY CLEAN - Osprey Brasil", "NÃO UTILIZAR - I GUM 24V (COMPLETO) Locação 24 meses - Osprey Brasil", "NÃO UTILIZAR - I LIGHT - Osprey Brasil", "NÃO UTILIZAR - I SCRUB 26 H - Osprey Brasil", "NÃO UTILIZAR - I SCRUB 30 - Elétrico - Osprey Brasil", "NÃO UTILIZAR - I SUIT - Osprey Brasil", "NÃO UTILIZAR - I VAC 30 - Osprey Brasil", "NÃO UTILIZAR - I VAC 4 MOVE - Osprey Brasil", "NÃO UTILIZAR - I VAC 5 - Elétrico - Osprey Brasil", "NÃO UTILIZAR - I VAC 6 - Elétrico - Osprey Brasil", "NÃO UTILIZAR - I VAC 9B - Osprey Brasil", "NÃO UTILIZAR - I-COBOTIC 45 - Locação 24 meses - Osprey Brasil", "NÃO UTILIZAR - I-Drive (6 Pares de Bateria + 3 Carregadores + Wall Charger + I-Mop Lite)", "NÃO UTILIZAR - I-Drive (6 Pares de Bateria + 3 Carregadores + Wall Charger + I-Mop Lite) - Locação 24 Meses Full", "NÃO UTILIZAR - I-DRIVE - Locação 24 meses - Osprey Brasil", "NÃO UTILIZAR - I-GUM - Osprey Brasil", "NÃO UTILIZAR - I-Mop XL - Locação", "NÃO UTILIZAR - IMOP LITE - Osprey Brasil", "NÃO UTILIZAR - IMOP XL - Osprey Brasil", "NÃO UTILIZAR - IMOP XXL - Osprey Brasil", "NÃO UTILIZAR - Kit Limpeza Em Altura - Osprey Brasil", "NÃO UTILIZAR - Kit Storm - A Bateria - Osprey Brasil", "NÃO UTILIZAR - Motor Scrubber Shock - Osprey Brasil", "NÃO UTILIZAR - Motorscrubber Force - Osprey Brasil", "NÃO UTILIZAR - Motorscrubber Jet - Osprey Brasil", "NÃO UTILIZAR - RA 660 - Osprey Brasil", "NÃO UTILIZAR - TRIPÉ I-LIGHT - Osprey Brasil", "NÃO UTILIZAR - Unidade Bateria I-MOP - Osprey Brasil", "NÃO UTILIZAR - X1 - Osprey Brasil", "Não Utilizar-Smartphone Moto G60 - Moto G - XT2135", "Não Utilizar-Smartphone Moto G60 - Moto G - XT2135 + Plano de Voz Vivo Smart 10", "Não Utilizar-Smartphone Motorola - Moto G9 Play", "Não Utilizar-Smartphone Motorola - Moto One Action", "Não Utilizar-Smartphone Xiaomi - Redmi 9A", "Ombrelone + Base", "Painel de Gestão à Vista (Físico) / Espelho (Padrão VS)", "Pano Multiuso - Microfibra (Amarelo, Azul, Verde ou Vermelho) - TTS", "Pano Tri+ Wet1/Dry - Mod. 00EG9010RB - Vermelho/Azul - TTS", "Parafuso Philips - 4x10mm - Inox - Mod. V020109 - TTS", "Pazinha Larga p/ Jardinagem - Cabo Curto", "Pequena Autolavadora de Piso - Mod. Excentr", "Pequena Autolavadora de Piso - Mod. Nilfisk AS 380E (Cabo) - 220V", "Perfil Novo Velcro - 320x24mm - Cinza - Mod. S030232 - TTS", "Perfil Novo Velcro - 350x24mm - Cinza - Mod. S030233 - TTS", "Pino Macho/Fêmea p/ Articulação - Amarelo - Mod. S030123AM - TTS", "Pinça p/ Mop Água - Mod. 1905 - Azul - TTS", "Pinça para Mop Água - TTS", "Placa Acrílica c/ Pino p/ Tampa - Mod. T070329 - TTS", "Placa Simples Amarela de Plástico - “Piso Molhado” - TTS", "Placa Simples Piso Molhado - Mod. 3576 - TTS", "Placa Sinalizadora", "Plano Vivo - Voz e Internet Móvel 20 GB", "Plano Vivo Box 100 GB", "Plano Vivo Box 40 GB", "Plataforma Elevatória Tesoura - Elétrica - 40 Pés", "Podador Cerca Viva", "Podador de Galhos", "Podador HS 82R - 600mm - Mod. 243", "Polidora B10 - Alfa Tennant", "Polidora B5/B7 Tennant Bateria - Alfa Tennant", "Polidora De Piso Pró-Álcool 280 Plus Sil - Alfa Tennant", "Polidora High Speed - Certec (220V/2400 RPM)", "Polidora Hs Br1600 - Alfa Tennant", "Polidora Kärcher Bdp 51/2000 - Alfa Tennant", "Polidora Kärcher Bdp 55/1900 - Alfa Tennant", "Polidora Kärcher Bdp 71/2000 - Alfa Tennant", "Polidora Pe420Bu 28\" Propano Eclipse Brasil - Alfa Tennant", "Polidora Shine Etanol - Alfa Tennant", "Polidora Shine Propano - Alfa Tennant", "Porta Chave de Armário - Mod. V550834 - TTS", "Porta Cinza - Mod. T690772E - TTS", "Prolongador - Verde - Mod. R090740 - TTS", "Pulverizador Costal - 16 Litros - Guarany", "Pulverizador Costal - 20 Litros", "Pulverizador de Mão - 1 Litro - Guarany", "Pá Coletora - Mod. 5635 - c/ Tampa e Alça Ergonômica - TTS", "Pá Coletora - Mod. 5647 B-Fly - Completa - TTS", "Pá Coletora Clip 4L s/ Tampa c/ Fixador - Mod. 45005611 - TTS", "Pá Coletora s/ Tampa - Verzani - Mod. PP555PS", "Pá Reta c/ Cabo - Bellota - p/ Plantio", "QR Code - Etiquetas", "Rastelo Curvo - 16 Dentes c/ Cabo", "Rastelo Curvo c/ 14 Dentes e Cabo", "Recipiente p/ Resíduos c/ Suporte - 25L - Mod. 5207E", "Refil - Mod. 475 Blik - Misto - TTS", "Refil - Mod. 694MB Looping - Azul - Quarto - TTS", "Refil - Mod. 695 Microblue - Piso, Parede e Teto - TTS", "Refil - Mod. 696 Microativa - Parede e Teto - TTS", "Refil - Mod. 729 Microblue - 30cm - TTS", "Refil - Mod. 733 Exon Microfibra - Pct c/ 50 Unidades - TTS", "Refil - Mod. 734 Clean Glass - 30cm - Pct c/ 5 Unidades - TTS", "Refil Aderente Microline Ezy 40 cm (1 uni) - TTS", "Refil Aderente Soft Fast - 40cm - Etiqueta Multicolor - TTS", "Refil Anti-Estático p/ Lamello - Caixa c/ 20 Pacotes (50 Unidades Cada - Total 1000 Refis) - TTS", "Refil de Microfibra Bend - 60cm - Azul - Mod. 30418 - TTS", "Refil Descartável - Mod. 0A9602 - Caixa c/ 10x25Un", "Refil Microblue p/ Blik - 40cm - Mod. 665 - TTS", "Refil Microblue Velcro - 40cm - Mod. 727 - TTS", "Refil Microfibra Clean Glass - 32cm p/ Vidros e Espelhos - Pacote c/ 5 Unidades - TTS", "Refil Microfibra p/ Bendy Bit - 60cm - Azul - TTS", "Refil Microfibra Soft Blik - Mod. B110E - TTS", "Refil Microsafe p/ Blik - 40cm - Mod. 666 - TTS", "Refil Misto Poliéster Azul, Microfibra Branca e Algodão c/ Etiqueta Multicolor - 40cm (1 uni) - TTS", "Refil Mop Pó Acrílico - 60x12cm - Mod. 142 - TTS", "Refil p/ Lamello - Caixa c/ 20x50 (1000 Unidades) - Mod. 750B - TTS", "Refil Velcro MF - 40cm - TTS", "Refil Velcro MF - Vermelho - 40cm - Mod. 739 - (5 Unidades) - TTS", "Refil Velcro Soft - 40cm - Mod. BRAA9520BE - TTS", "Refil Wet System Algodão c/ Aba - Azul - Mod. 691 - TTS", "Refil Wet System Misto Microfibra - Mod. 485 - TTS", "Regador Plástico - 8 Litros", "Removedora Barracuda A Prop Uhs - Alfa Tennant", "Reservatório 1000ml - Azul - Mod. S040465 - TTS", "Reservatório Bio System - 0,65L - Azul - Mod. S040460 - TTS", "Rodo - 40cm (Uso p/ Carro)", "Rodo - Mod. 8641 - Industrial - 45cm - Azul - TTS", "Rodo Alumínio - 40cm (Uso p/ Carro TTS)", "Rodo Alumínio - 60cm (Uso p/ Carro TTS)", "Rodo Industrial - 45cm - TTS", "Rodízio 4\" c/ Bucha - Mod. 450V3479 - TTS", "Roupeiro de Aço - 04 Portas - 1930x1035x400mm", "Roupeiro de Aço - 8 Portas - 1980x1260x420mm - Mod. GRP08", "Roçadeira a Bateria - Husqvarna - Mod. 520iRX 36V (s/ Bateria e Carregador)", "Roçadeira de Arrasto", "Roçadeira Flutuante - GX560", "Roçadeira Lateral - Husqvarna", "Roçadeira Lateral - Stihl", "Rádio HT", "S10 Tennant Bateria 1 Esc Lat Varr - Alfa Tennant", "S16 Tennantbateria 1 Esc Lat Varr - Alfa Tennant", "S20 Tennant Glp 1 Esc Lat Varr Com Protetor Do Operador - Alfa Tennant", "S30 Tennant Glp 1 Esc Lat Varr 3 Rodas Com Protetor Do Operador - Alfa Tennant", "S30 Tennant Glp 1 Esc Lat Varr 3 Rodas Sem Protetor Do Operador - Alfa Tennant", "S7 Tennant Bateria 1 Esc Lat Varr - Alfa Tennant", "S960 Tennant Bateria - Alfa Tennant", "Sa12000/Sa2000 Alfa Bateria - Alfa Tennant", "Sa4000 Alfa Bateria - Alfa Tennant", "Sacho 1 Ponta (Coração/Enxadinha) - Cabo Longo", "Sacho de Duas Pontas c/ Cabo", "Sacho Tipo Coração c/ Cabo", "Saco Azul ou Cinza - 120L - TTS", "Saco Cinza - 150L - Mod. 3629 - TTS", "Secador de Piso - Mod. AB 30 - Karcher", "Secador Tennant 220V - Alfa Tennant", "Serrote c/ Cabo Telescópico - Limmat - 4m", "Serrote c/ Cabo Telescópico - Limmat - 6m", "Serrote de Arco", "Serrote de Poda - Limmat - 13\"", "Serrote de Poda - Limmat - Mod. C-47", "Sistema LORA (Botoeiras / Chamados)", "Smartphone - Motorola G06 - 5G - 128GB", "Smartphone - Motorola G35 128GB 5G Dualsim", "Soprador a Bateria - Husqvarna Mod. 525iB 36V - Linha Pro (s/ Bateria e Carregador)", "Soprador/Triturador de Folhas", "Static Paper - Bralimpia", "Storm", "Suporte Blik s/ Articulação - Mod. R030877 - TTS", "Suporte c/ Velcro - 40cm - Mod. 885 - TTS", "Suporte Infinit Ray (Substituto do BIO - Mop Úmido)", "Suporte Lamello - 40cm c/ Lâmina de Borracha - Mod. 960 - TTS", "Suporte Lamello - 40cm c/ Lâminas de Borracha (Esterilizável até 120°C) - TTS", "Suporte Limpa Tudo - Cinza c/ Articulacao Cinza c/ Rosca Amarela - TTS", "Suporte Limpa Tudo - Verde - Mod. 8700 - TTS", "Suporte LT", "Suporte Manual - Bralimpia", "Suporte Manual - Mod. 8702E - 30cm - TTS", "Suporte Manual Aderente c/ Raspador em Ambos os Lados (Esterilizável) - 30cm - Cinza - TTS", "Suporte Microfibra - Clean Glass - 32cm", "Suporte Mop Pó - 120cm - Ref. BR00856 - TTS", "Suporte Mop Pó - 60cm - Mod. 802 - TTS", "Suporte Mop Pó Dobrável - 40 x 12 cm - TTS", "Suporte Mop Pó Dobrável - 61x14cm - Mod. 951 - TTS", "Suporte p/ Reservatório c/ Conector de Mangueira - Mod. 450S040830 - TTS", "Suporte Velcro - 30cm c/ Block - Mod. 894Y - TTS", "Suporte Velcro - 40cm s/ Articulação - Mod. R030178 - TTS", "Suporte Wet System - Cinza - Mod. 868CZ - TTS", "T16 Amr Autonoma Bateria - Alfa Tennant", "T16 C Tennant Bateria + Jogo Extra De Bateria - Alfa Tennant", "T16 C Tennant Bateria - Alfa Tennant", "T16 D Tennant Bateria + Jogo Extra De Bateria - Alfa Tennant", "T16 D Tennant Bateria - Alfa Tennant", "T17 C Tennant Bateria Com Protetor Cilindrica - Alfa Tennant", "T17 D Tennant Bateria Com Protetor Disco - Alfa Tennant", "T20 Tennant Glp Cilindrica 1 Esc Lat Lav Com Protetor Do Operador - Alfa Tennant", "T20 Tennant Glp Cilindrica 1 Esc Lat Lav Sem Protetor Do Operador - Alfa Tennant", "T600E Tennant Bateria - Alfa Tennant", "T7 Amr Autonoma Bateria - Alfa Tennant", "T7 Tennant Bateria - Alfa Tennant", "Tablet Samsung - Tab A - Tela de 7\"", "Tampa Cinza p/ Coletor Aberto - 120L - TTS", "Tanquinho p/ Lavagem de Roupas", "Tela Mosquiteiro p/ Jardinagem - Rolo c/ 50m x 1,80m", "Tela Protetora p/ Roçagem c/ Roda - 1,20m x 2,0m", "Terminal do Corpo Mop Pó - Amarelo - Mod. S030122AM - TTS", "Tesoura de Mão - Limmat", "Tesoura p/ Cerca Viva - Bellota", "Tesoura p/ Poda de Galhos - Cabo Curto - Tipo Alicate", "Tesoura p/ Poda de Galhos - Cabo Longo - Bico de Papagaio", "Trator Agrícola - Massey", "Trator Giro Zero - Mod. Z560X", "Tripé I-Light", "Vanga Quadrada c/ Cabo - Bellota", "Vanga Redonda c/ Cabo - Bellota", "Varredeira Coletora - Mod. CMV", "Varredeira Operação a Pé - Mod. KM 70/20 C - Dupla", "Vassoura c/ Pá Coletora - Mod. 5560 - TTS", "Vassoura Feiticeira - Live Well", "Vassoura Metálica c/ 22 Dentes e Cabo", "Vassoura Plástica c/ 26 Dentes e Cabo", "Ventilador", "Veículo 4x4 Especial", "Veículo Compacto c/ Ar", "Veículo Executivo Blindado", "Veículo Pick-Up c/ Ar", "Veículo SUV Automático", "Wiper (Limpeza de Superfícies) - Rolo de 600m", "X4 Rovr Autonoma Bateria - Alfa Tennant", "Óleo 2 Tempos"];
+const CARGOS = ["Agente de Limpeza","Auxiliar de Limpeza","Auxiliar de Limpeza Técnica","Faxineiro","Faxineiro Líder","Servente","Encarregado(a) de Limpeza","Supervisor(a) de Limpeza","Operador de Máquinas","Limpador de Vidros / Alpinista Industrial","Copeiro(a)","Copeiro(a) Líder","Arrumadeira","Auxiliar de Serviços Gerais","Porteiro","Controlador de Acesso","Recepcionista","Vigilante","Vigilante Líder","Bombeiro Civil","Bombeiro Líder","Jardineiro","Auxiliar de Jardinagem","Auxiliar de Manutenção Predial","Eletricista","Eletricista Baixa tensão","Encanador","Pintor","Técnico de Refrigeração","Oficial de Manutenção"];
+const SERVICOS = ["Limpeza","Portaria","Vigilância","Manutenção","Jardinagem","Copa","Brigada"];
+const SEGMENTOS = ["Indústria","Logística / CD","Escritório corporativo","Hospital / Saúde","Varejo / Shopping","Condomínio","Educação","Órgão público","Outro"];
+const UFS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+const TIPOS_AREA = ["Escritório","Sanitário","Vestiário","Refeitório / Copa","Produção","Armazém / Doca","Laboratório","Recepção / Hall","Área externa","Fachada / Vidros","Estacionamento","Escadas / Circulação","Outro"];
+const PISOS = ["Porcelanato","Cerâmica","Epóxi","Concreto","Vinílico","Granito / Mármore","Carpete","Paviflex","Asfalto / Intertravado","Outro"];
+const FREQS = ["2x ao dia ou mais","Diária","3x por semana","Semanal","Quinzenal","Mensal","Sob demanda"];
+const ESCALAS = {"5x2":1,"6x1":1,"5x1":1.2,"12x36 diurno":2,"12x36 noturno":2,"4x2":1.5,"Folguista":1,"Outros":1};
+const INSAL = ["N/A","10% (mínimo)","20% (médio)","40% (máximo)"];
+const EXIG = ["NR-10 (elétrica)","NR-12 (máquinas)","NR-18 (obras)","NR-33 (espaço confinado)","NR-35 (trabalho em altura)","ART de responsável técnico","Integração de segurança do cliente","Exames complementares","PCMSO / PGR do cliente","Crachá / cadastro de acesso","Seguro de responsabilidade civil"];
+const INFRA = ["Vestiário para a equipe","DML / depósito de materiais","Refeitório disponível","Ponto de água e energia","Armário para guardar equipamentos","Estacionamento para a equipe","Transporte fretado do cliente"];
+const STEPS = [
+  {id:"visita",t:"Visita",h:"Dados da visita",p:"Quem é o cliente, onde fica e quem acompanhou a visita."},
+  {id:"areas",t:"Áreas",h:"Áreas e ambientes",p:"Cada ambiente com metragem, tipo de piso e frequência de limpeza."},
+  {id:"postos",t:"Postos",h:"Quadro de pessoal",p:"Postos, escalas e horários levantados. Esta parte vai direto para a aba de quadro de pessoal da PAC."},
+  {id:"beneficios",t:"Benefícios",h:"Benefícios",p:"Transporte, alimentação, convênios e seguro previstos para a equipe."},
+  {id:"recursos",t:"Recursos",h:"Equipamentos e exigências",p:"Equipamentos, insumos, controle de ponto e exigências de segurança do cliente."},
+  {id:"fechamento",t:"Fechamento",h:"Pontos críticos e fotos",p:"O que pode pesar no preço ou na operação."},
+  {id:"enviar",t:"Enviar",h:"Revisar e enviar",p:"Confira o resumo, escolha quem recebe e envie o relatório em PDF com a planilha para a PAC."}
+];
+const MAX_FOTOS=4;
+const APP_VERSAO="1.0";
+const LOGO="data:image/png;base64,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", LOGO_R=203/78;
+const LS_DRAFT="vt_rascunho_v1", LS_CFG="vt_config_v1", LS_HIST="vt_historico_v1";
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function lsGet(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+const hoje=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fmtData=s=>s?s.split("-").reverse().join("/"):"";
+const num=v=>{const n=parseFloat(String(v??"").replace(/\./g,"").replace(",","."));return isFinite(n)?n:0};
+const brl=v=>{const s=String(v??"").trim();if(!s)return "";const n=num(s);return n?n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):s};
+const fmtDH=s=>{if(!s)return"";const d=new Date(s);return d.toLocaleDateString("pt-BR")+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})};
+const fmtN=n=>n.toLocaleString("pt-BR",{maximumFractionDigits:1});
+
+function blank(){
+  return {exemplo:false,
+    visita:{cliente:"",unidade:"",endereco:"",cidade:"",uf:"",segmento:"",servicos:["Limpeza"],respComercial:"",tecnico:"",data:hoje(),contatoNome:"",contatoCargo:"",contatoTel:"",contatoEmail:"",areaTotal:"",funcionamento:"",fornecedorAtual:"",motivo:"",inicio:""},
+    areas:[],postos:[],equipamentos:[],
+    recursos:{materiais:"Contratada",valorMateriais:"",descartaveis:"Cliente",pisoTrat:"",uniforme:"Padrão Verzani",epi:"",ponto:"Nexti - Facial",exig:[],infra:[],obs:""},
+    quadro:{origem:"Dimensionamento Operação",edital:""},
+    beneficios:{transporte:"Vale-transporte (VT)",transporteValor:"",alimentacao:"VA conforme CCT",alimentacaoValor:"",medico:"Conforme CCT",odonto:"Conforme CCT",seguro:"Sim",cesta:"Não",cestaValor:"",assiduidade:"Não",assiduidadeValor:"",adicional:""},
+    fechamento:{criticos:"",obs:"",prazo:"",fotos:[],assinatura:"",assNome:""}
+  };
+}
+function exemplo(){
+  const s=blank(); s.exemplo=true;
+  Object.assign(s.visita,{cliente:"DHL Extrema",unidade:"Matriz",endereco:"Rod. Fernão Dias, km 947",cidade:"Extrema",uf:"MG",segmento:"Logística / CD",servicos:["Limpeza"],respComercial:"Mario Ataide",tecnico:"Luciano Evaristo",contatoNome:"Responsável de Facilities",contatoCargo:"Facilities",areaTotal:"11.130",funcionamento:"Seg a sex, 06h às 22h",fornecedorAtual:"",motivo:"Implantação nova",inicio:""});
+  s.areas=[
+    {id:uid(),nome:"Escritório administrativo",tipo:"Escritório",m2:"1.200",piso:"Porcelanato",freq:"Diária",fluxo:"Médio",altura:false,obs:"Estações de trabalho e 3 salas de reunião.",fotos:[]},
+    {id:uid(),nome:"Sanitários e vestiários",tipo:"Sanitário",m2:"180",piso:"Cerâmica",freq:"2x ao dia ou mais",fluxo:"Alto",altura:false,obs:"Uso coletivo dos turnos da operação.",fotos:[]},
+    {id:uid(),nome:"Armazém e docas",tipo:"Armazém / Doca",m2:"8.000",piso:"Epóxi",freq:"Diária",fluxo:"Alto",altura:false,obs:"Limpeza mecanizada com lavadora de piso.",fotos:[]},
+    {id:uid(),nome:"Refeitório",tipo:"Refeitório / Copa",m2:"250",piso:"Cerâmica",freq:"2x ao dia ou mais",fluxo:"Alto",altura:false,obs:"",fotos:[]},
+    {id:uid(),nome:"Fachada envidraçada",tipo:"Fachada / Vidros",m2:"1.500",piso:"Outro",freq:"Mensal",fluxo:"Baixo",altura:true,obs:"Vidros acima de 2 m na recepção.",fotos:[]}
+  ];
+  s.postos=[
+    {id:uid(),qtd:1,cargo:"Faxineiro Líder",escala:"5x2",colab:"1",ent:"07:00",sai:"16:20",int:"60",feriados:"Não",insal:"N/A",peric:"Não",acumulo:"Não",acumuloDesc:"",salario:"CCT",salarioValor:"",obs:""},
+    {id:uid(),qtd:2,cargo:"Faxineiro",escala:"5x2",colab:"1",ent:"06:00",sai:"14:20",int:"60",feriados:"Não",insal:"N/A",peric:"Não",acumulo:"Não",acumuloDesc:"",salario:"CCT",salarioValor:"",obs:""},
+    {id:uid(),qtd:2,cargo:"Faxineiro",escala:"5x2",colab:"1",ent:"14:00",sai:"22:20",int:"60",feriados:"Não",insal:"N/A",peric:"Não",acumulo:"Não",acumuloDesc:"",salario:"CCT",salarioValor:"",obs:""},
+    {id:uid(),qtd:1,cargo:"Operador de Máquinas",escala:"5x2",colab:"1",ent:"07:00",sai:"16:20",int:"60",feriados:"Não",insal:"N/A",peric:"Não",acumulo:"Não",acumuloDesc:"",salario:"Sugestão",salarioValor:"2.625,44",obs:""},
+    {id:uid(),qtd:1,cargo:"Eletricista Baixa tensão",escala:"5x2",colab:"1",ent:"07:00",sai:"16:20",int:"60",feriados:"Não",insal:"N/A",peric:"Sim",obs:""},
+    {id:uid(),qtd:1,cargo:"Servente",escala:"5x2",colab:"1",ent:"07:00",sai:"16:20",int:"60",feriados:"Não",insal:"N/A",peric:"Sim",obs:""}
+  ];
+  s.equipamentos=[
+    {id:uid(),item:"Lavadora de piso a bateria",qtd:1,tipo:"Locação",obs:"Para o piso epóxi do armazém"},
+    {id:uid(),item:"Lavadora de alta pressão 220V",qtd:1,tipo:"Compra"},
+    {id:uid(),item:"Aspirador de pó e água 220V",qtd:1,tipo:"Compra"},
+    {id:uid(),item:"Carro funcional com bolsa",qtd:2,tipo:"Compra"},
+    {id:uid(),item:"Kit limpa-vidros com extensor 4,5 m",qtd:1,tipo:"Compra"},
+    {id:uid(),item:"Escada de alumínio 7 degraus",qtd:1,tipo:"Compra"},
+    {id:uid(),item:"Placa sinalizadora de piso molhado",qtd:4,tipo:"Compra"}
+  ];
+  Object.assign(s.recursos,{materiais:"Contratada",valorMateriais:"1.600,00",descartaveis:"Cliente",pisoTrat:"",epi:"Calçado de segurança e protetor auricular nas docas",ponto:"Nexti - Facial",exig:["NR-12 (máquinas)","NR-35 (trabalho em altura)","Integração de segurança do cliente"],infra:["Vestiário para a equipe","DML / depósito de materiais","Refeitório disponível"]});
+  Object.assign(s.beneficios,{transporte:"Vale-transporte (VT)",transporteValor:"82,50",alimentacao:"VA conforme CCT",alimentacaoValor:"31,34",medico:"Sim",odonto:"Não",seguro:"Sim",cesta:"Sim",cestaValor:"200,00",assiduidade:"Sim",assiduidadeValor:"400,00",adicional:""});
+  Object.assign(s.fechamento,{criticos:"Circulação de empilhadeiras nas docas: limpeza só nas janelas entre turnos.\nVidros da fachada exigem NR-35 e equipamento de acesso.",obs:"Cliente pediu proposta com e sem o posto de eletricista.",prazo:""});
+  return s;
+}
+let S=null;
+let CFG = lsGet(LS_CFG) || {dest:[{email:"rodrigo.nunes@verzani.com.br",nome:"Rodrigo Nunes",on:true},{email:"luciano.evaristo@verzani.com.br",nome:"Luciano Evaristo",on:false}],url:"https://script.google.com/macros/s/AKfycbydjtlxUBEtyA2DWN-5Rx6lqIr9iJtb9PCgQleBl-rOfjZ8yFZqxzmES2u5Ze7R3gU/exec",chave:"",remetente:"Visita Técnica · Luciano Evaristo"};
+function salvaCfg(){lsSet(LS_CFG,CFG)}
+function normaliza(x){
+  const b=blank();
+  if(!x.id)x.id=uid(); if(!x.status)x.status="rascunho"; if(!x.criadoEm)x.criadoEm=new Date().toISOString();
+  x.visita=Object.assign(b.visita,x.visita||{}); x.recursos=Object.assign(b.recursos,x.recursos||{});
+  x.beneficios=Object.assign(b.beneficios,x.beneficios||{}); x.quadro=Object.assign(b.quadro,x.quadro||{});
+  x.fechamento=Object.assign(b.fechamento,x.fechamento||{});
+  x.areas=(x.areas||[]).map(a=>Object.assign({fotos:[]},a)); x.postos=x.postos||[]; x.equipamentos=x.equipamentos||[];
+  if(x.fechamento.fotos.length>MAX_FOTOS)x.fechamento.fotos=x.fechamento.fotos.slice(0,MAX_FOTOS);
+  return x;
+}
+/* banco local (IndexedDB) */
+const DB=(()=>{let p;
+  function abrir(){return p||(p=new Promise((res,rej)=>{const r=indexedDB.open("visita-tecnica",1);r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains("visitas"))d.createObjectStore("visitas",{keyPath:"id"});if(!d.objectStoreNames.contains("fila"))d.createObjectStore("fila",{keyPath:"id"})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+  async function tx(st,modo,fn){const d=await abrir();return new Promise((res,rej)=>{const t=d.transaction(st,modo);const req=fn(t.objectStore(st));t.oncomplete=()=>res(req?req.result:undefined);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)})}
+  return {get:(st,k)=>tx(st,"readonly",o=>o.get(k)),all:st=>tx(st,"readonly",o=>o.getAll()),put:(st,v)=>tx(st,"readwrite",o=>o.put(v)),del:(st,k)=>tx(st,"readwrite",o=>o.delete(k))};
+})();
+let tela="capa";
+let step = 0, saveTimer=null, sending=false, lastStatus=null;
+
+function persist(){clearTimeout(saveTimer);saveTimer=setTimeout(salvarAgora,400)}
+async function salvarAgora(){
+  clearTimeout(saveTimer);if(!S)return;
+  S.atualizadoEm=new Date().toISOString();
+  try{await DB.put("visitas",JSON.parse(JSON.stringify(S)));lsSet("vt_atual",S.id);indicador()}
+  catch(e){document.getElementById("saveInd").textContent="Não foi possível salvar neste aparelho"}
+}
+let nFila=0;
+async function indicador(){
+  try{nFila=(await DB.all("fila")).length}catch(e){}
+  const el=document.getElementById("saveInd");
+  el.textContent="Salvo neste aparelho"+(nFila?` · ${nFila} envio${nFila>1?"s":""} aguardando internet`:"")+(navigator.onLine?"":" · sem internet");
+}
+function getPath(p){return p.split(".").reduce((o,k)=>o?.[k],S)}
+function setPath(p,v){const ks=p.split(".");const last=ks.pop();ks.reduce((o,k)=>o[k],S)[last]=v}
+
+/* ---------- cálculos ---------- */
+function mins(t){if(!t||!/^\d{1,2}:\d{2}$/.test(t))return null;const [h,m]=t.split(":").map(Number);return h*60+m}
+function calcPosto(p){
+  const a=mins(p.ent),b=mins(p.sai); if(a==null||b==null)return null;
+  let dur=(b-a+1440)%1440; if(dur===0)dur=1440;
+  const intv=num(p.int); let not=0;
+  for(let m=0;m<dur;m++){const t=(a+m)%1440;if(t>=1320||t<300)not++}
+  const fator=(p.colab!=null&&String(p.colab).trim()!=="")?num(p.colab):(ESCALAS[p.escala]??1);
+  return {trab:Math.max(0,dur-intv),not,efetivo:num(p.qtd)*fator,fator};
+}
+const colabDe=p=>(p.colab!=null&&String(p.colab).trim()!=="")?num(p.colab):(ESCALAS[p.escala]??1);
+const escalaDe=p=>p.escala==="Outros"?(String(p.escalaOutra||"").trim()||"Outros"):p.escala;
+const isEdital=()=>S.quadro&&S.quadro.origem==="Edital";
+const postosAtivos=()=>isEdital()?[]:S.postos;
+const hm=m=>Math.floor(m/60)+"h"+(m%60?String(m%60).padStart(2,"0"):"");
+function totais(){
+  let postos=0,efetivo=0;postosAtivos().forEach(p=>{postos+=num(p.qtd);efetivo+=num(p.qtd)*colabDe(p)});
+  const m2=S.areas.reduce((s,a)=>s+num(a.m2),0);
+  const fotos=Math.min(S.fechamento.fotos.length,MAX_FOTOS);
+  return {postos,efetivo,m2,fotos,equip:S.equipamentos.reduce((s,e)=>s+num(e.qtd),0)};
+}
+function alertas(){
+  const out=[];
+  const sanit=S.areas.filter(a=>["Sanitário","Vestiário"].includes(a.tipo)&&a.fluxo==="Alto");
+  if(sanit.length&&!isEdital()&&!S.postos.some(p=>p.insal.startsWith("40")))out.push({k:"warn",t:"Sanitário ou vestiário de grande circulação ("+sanit.map(a=>a.nome||a.tipo).join(", ")+"). Avalie insalubridade em grau máximo (40%) para os postos que atendem essa área (NR-15, Anexo 14 e Súmula 448 do TST)."});
+  const alt=S.areas.filter(a=>a.altura);
+  if(alt.length&&!S.recursos.exig.includes("NR-35 (trabalho em altura)"))out.push({k:"warn",t:"Há área com trabalho acima de 2 m ("+alt.map(a=>a.nome||a.tipo).join(", ")+"), mas a NR-35 não foi marcada nas exigências."});
+  const not=postosAtivos().filter(p=>{const c=calcPosto(p);return c&&c.not>0});
+  if(not.length)out.push({k:"info",t:"Postos com horas entre 22h e 5h: "+not.map(p=>p.cargo+" "+p.ent+"–"+p.sai).join("; ")+". A PAC calcula o adicional noturno a partir desses horários."});
+  return out;
+}
+
+/* ---------- componentes ---------- */
+const fld=(label,inner,req)=>`<label class="f"><span>${label}${req?" <em>*</em>":""}</span>${inner}</label>`;
+const inp=(k,o={})=>`<input id="${o.id||k.replace(/\./g,"-")}" data-k="${k}" type="${o.type||"text"}" value="${esc(getPath(k))}" ${o.ph?`placeholder="${esc(o.ph)}"`:""} ${o.mode?`inputmode="${o.mode}"`:""} ${o.list?`list="${o.list}"`:""} autocomplete="off">`;
+const sel=(k,opts,o={})=>`<select id="${o.id||k.replace(/\./g,"-")}" data-k="${k}">${o.empty?`<option value="">${o.empty}</option>`:""}${opts.map(v=>`<option${getPath(k)===v?" selected":""}>${esc(v)}</option>`).join("")}</select>`;
+const txt=(k,o={})=>`<textarea id="${k.replace(/\./g,"-")}" data-k="${k}" ${o.ph?`placeholder="${esc(o.ph)}"`:""}>${esc(getPath(k))}</textarea>`;
+const linp=(l,it,f,o={})=>`<input id="${l}-${it.id}-${f}" data-l="${l}" data-i="${it.id}" data-f="${f}" type="${o.type||"text"}" value="${esc(it[f])}" ${o.ph?`placeholder="${esc(o.ph)}"`:""} ${o.mode?`inputmode="${o.mode}"`:""} ${o.list?`list="${o.list}"`:""} autocomplete="off">`;
+const lsel=(l,it,f,opts)=>`<select id="${l}-${it.id}-${f}" data-l="${l}" data-i="${it.id}" data-f="${f}" data-re="1">${opts.map(v=>`<option${it[f]===v?" selected":""}>${esc(v)}</option>`).join("")}</select>`;
+function photoGrid(scope,arr){
+  return `<div class="photos">${arr.map(p=>`<div class="ph"><img src="${p.src}" alt="Foto da visita"><button type="button" data-delph="${scope}" data-pid="${p.id}" aria-label="Remover foto">×</button></div>`).join("")}
+  ${arr.length<MAX_FOTOS?`<label class="ph-add">+ Foto<input type="file" accept="image/*" multiple data-addph="${scope}"></label>`:""}</div>
+  <p class="muted" style="margin:0;font-size:13px">${arr.length} de ${MAX_FOTOS} fotos</p>`;
+}
+
+/* ---------- etapas ---------- */
+function vVisita(){
+  const v=S.visita;
+  return `<div class="card">
+    <div class="grid2">${fld("Cliente",inp("visita.cliente",{ph:"Razão social ou nome fantasia"}),1)}${fld("Unidade",inp("visita.unidade",{ph:"Ex.: Matriz, CD 2"}))}</div>
+    ${fld("Endereço",inp("visita.endereco"))}
+    <div class="grid2">${fld("Cidade",inp("visita.cidade"),1)}<div class="grid2" style="grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr)">${fld("UF",sel("visita.uf",UFS,{empty:"—"}))}${fld("Data da visita",inp("visita.data",{type:"date"}),1)}</div></div>
+    <div class="f"><span>Serviços avaliados</span><div class="chips">${SERVICOS.map(s=>`<label class="chip"><input type="checkbox" data-arr="visita.servicos" value="${s}"${v.servicos.includes(s)?" checked":""}><span>${s}</span></label>`).join("")}</div></div>
+    <div class="grid2">${fld("Segmento",sel("visita.segmento",SEGMENTOS,{empty:"Selecione"}))}${fld("Área total construída (m²)",inp("visita.areaTotal",{mode:"decimal"}))}</div>
+    <div class="grid2">${fld("Responsável comercial",inp("visita.respComercial"))}${fld("Quem fez a visita",inp("visita.tecnico"))}</div>
+  </div>
+  <h3 class="sec-title">Acompanhante do cliente</h3>
+  <div class="card">
+    <div class="grid2">${fld("Nome",inp("visita.contatoNome"))}${fld("Cargo",inp("visita.contatoCargo"))}</div>
+    <div class="grid2">${fld("Telefone",inp("visita.contatoTel",{type:"tel"}))}${fld("E-mail",inp("visita.contatoEmail",{type:"email"}))}</div>
+  </div>
+  <h3 class="sec-title">Operação</h3>
+  <div class="card">
+    <div class="grid2">${fld("Horário de funcionamento",inp("visita.funcionamento",{ph:"Ex.: seg a sex, 06h às 22h"}))}${fld("Início desejado",inp("visita.inicio",{type:"date"}))}</div>
+    <div class="grid2">${fld("Prestador atual",inp("visita.fornecedorAtual",{ph:"Se houver"}))}${fld("Motivo da troca / contratação",inp("visita.motivo"))}</div>
+  </div>`;
+}
+function vAreas(){
+  const t=totais();
+  return `<div class="note info">${S.areas.length} ambiente(s) · <b class="mono">${fmtN(t.m2)} m²</b> levantados${S.visita.areaTotal?` de ${esc(S.visita.areaTotal)} m² construídos`:""}</div>
+  ${S.areas.map((a,i)=>`<div class="item">
+    <div class="item-head"><b>${esc(a.nome||"Ambiente "+(i+1))}</b><button class="btn ghost" type="button" data-del="areas" data-i="${a.id}">Remover</button></div>
+    <div class="grid2">${fld("Nome do ambiente",linp("areas",a,"nome",{ph:"Ex.: Sanitário masculino térreo"}))}${fld("Tipo",lsel("areas",a,"tipo",TIPOS_AREA))}</div>
+    <div class="grid3">${fld("Área (m²)",linp("areas",a,"m2",{mode:"decimal"}))}${fld("Piso",lsel("areas",a,"piso",PISOS))}${fld("Frequência",lsel("areas",a,"freq",FREQS))}</div>
+    <div class="grid2">${fld("Fluxo de pessoas",lsel("areas",a,"fluxo",["Baixo","Médio","Alto"]))}
+      <label class="cb" style="align-self:end;padding-bottom:10px"><input type="checkbox" data-l="areas" data-i="${a.id}" data-f="altura" data-re="1"${a.altura?" checked":""}> Trabalho acima de 2 m (NR-35)</label></div>
+    ${fld("Observações",`<textarea id="areas-${a.id}-obs" data-l="areas" data-i="${a.id}" data-f="obs">${esc(a.obs)}</textarea>`)}
+  </div>`).join("")}
+  <button class="btn add" type="button" data-add="areas">+ Adicionar ambiente</button>`;
+}
+function vPostos(){
+  const o=S.quadro.origem;
+  const seletor=`<div class="card"><div class="f"><span>Origem do quadro de pessoal</span><div class="chips">${["Edital","Dimensionamento Operação"].map(x=>`<label class="chip"><input type="radio" name="origemQuadro" data-k="quadro.origem" value="${x}"${o===x?" checked":""}><span>${x}</span></label>`).join("")}</div></div>
+    ${o==="Edital"?`<div class="note info">O cliente já tem o quadro projetado no edital. Os campos de postos ficam de fora do relatório e da planilha.</div>${fld("Referência do edital",inp("quadro.edital",{ph:"Ex.: Pregão 12/2026, anexo II"}))}`:""}</div>`;
+  if(o==="Edital")return seletor;
+  const t=totais(); const al=alertas().filter(a=>!a.t.startsWith("Há área"));
+  return seletor+`<div class="tiles"><div class="tile"><span>Postos</span><b>${fmtN(t.postos)}</b></div><div class="tile"><span>Efetivo</span><b>${fmtN(t.efetivo)}</b></div><div class="tile"><span>Linhas</span><b>${S.postos.length}</b></div><div class="tile"><span>Noturno</span><b>${S.postos.filter(p=>{const c=calcPosto(p);return c&&c.not}).length}</b></div></div>
+  ${al.map(a=>`<div class="note ${a.k}">${esc(a.t)}</div>`).join("")}
+  ${S.postos.map((p,i)=>{const c=calcPosto(p);return `<div class="item">
+    <div class="item-head"><b>${esc(p.cargo||"Posto "+(i+1))}</b><button class="btn ghost" type="button" data-del="postos" data-i="${p.id}">Remover</button></div>
+    ${fld("Cargo",linp("postos",p,"cargo",{list:"dl-cargos",ph:"Digite ou escolha"}))}
+    <div class="grid3 keep">${fld("Postos",linp("postos",p,"qtd",{type:"number",mode:"numeric"}))}${fld("Qtd",`<input id="postos-${p.id}-colab" data-l="postos" data-i="${p.id}" data-f="colab" type="number" inputmode="decimal" step="0.5" min="0" value="${esc(colabDe(p))}">`)}${fld("Escala",lsel("postos",p,"escala",Object.keys(ESCALAS)))}</div>
+    ${p.escala==="Outros"?fld("Escala praticada",linp("postos",p,"escalaOutra",{ph:"Ex.: 5x2 + 1 sábado por mês, 12x36 com folga extra"})):""}
+    <div class="grid3 keep">${fld("Entrada",linp("postos",p,"ent",{type:"time"}))}${fld("Saída",linp("postos",p,"sai",{type:"time"}))}${fld("Intervalo",`<select id="postos-${p.id}-int" data-l="postos" data-i="${p.id}" data-f="int" data-re="1">${[["60","1h"],["30","30 min"],["15","15 min"],["0","Sem intervalo"]].map(([v,l])=>`<option value="${v}"${p.int===v?" selected":""}>${l}</option>`).join("")}</select>`)}</div>
+    <div class="grid3">${fld("Trabalha em feriados",lsel("postos",p,"feriados",["Não","Sim"]))}${fld("Insalubridade",lsel("postos",p,"insal",INSAL))}${fld("Periculosidade (30%)",lsel("postos",p,"peric",["Não","Sim"]))}</div>
+    <div class="calc">${c?`<span class="pill">${hm(c.trab)} trabalhadas/dia</span>${c.not?`<span class="pill warn">${hm(c.not)} noturnas</span>`:""}<span class="pill ok">Efetivo ${fmtN(c.efetivo)} (${esc(p.qtd)} posto${num(p.qtd)===1?"":"s"} × ${fmtN(c.fator)})</span>`:`<span class="pill">Informe entrada e saída</span>`}</div>
+    <div class="grid2" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)">${fld("Salário",lsel("postos",p,"salario",["CCT","Sugestão"]))}${(p.salario||"CCT")==="Sugestão"?fld("Salário sugerido (R$)",linp("postos",p,"salarioValor",{mode:"decimal",ph:"Ex.: 2.100,00"})):`<div class="f"><span>&nbsp;</span><p class="muted" style="margin:10px 0 0;font-size:14px">Piso da convenção coletiva</p></div>`}</div>
+    <div class="grid2" style="grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)">${fld("Recebe acúmulo de função",lsel("postos",p,"acumulo",["Não","Sim"]))}${p.acumulo==="Sim"?fld("Descrição do acúmulo",linp("postos",p,"acumuloDesc",{ph:"Ex.: 20% por acumular líder de turno"})):`<div></div>`}</div>
+    ${fld("Observações do posto",linp("postos",p,"obs",{ph:"Ex.: cobre sanitários do térreo"}))}
+  </div>`}).join("")}
+  <button class="btn add" type="button" data-add="postos">+ Adicionar posto</button>`;
+}
+function vRecursos(){
+  const r=S.recursos;
+  return `<h3 class="sec-title">Equipamentos</h3>
+  ${S.equipamentos.map(e=>`<div class="item" style="padding-block:12px">
+    <div class="grid3" style="grid-template-columns:minmax(0,3fr) minmax(0,.8fr) minmax(0,1.2fr)">${fld("Equipamento",linp("equipamentos",e,"item",{list:"dl-equip",ph:"Digite para buscar no catálogo"}))}${fld("Qtd",linp("equipamentos",e,"qtd",{type:"number",mode:"numeric"}))}${fld("Aquisição",lsel("equipamentos",e,"tipo",["Compra","Locação","Do cliente"]))}</div>
+    ${fld("Observação",linp("equipamentos",e,"obs",{ph:"Ex.: voltagem 220V, uso nas docas, cliente já possui 1"}))}
+    <div style="justify-self:end"><button class="btn ghost" type="button" data-del="equipamentos" data-i="${e.id}">Remover</button></div>
+  </div>`).join("")}
+  <button class="btn add" type="button" data-add="equipamentos">+ Adicionar equipamento</button>
+  <h3 class="sec-title">Insumos e uniforme</h3>
+  <div class="card">
+    <div class="grid2">${fld("Materiais de limpeza fornecidos por",sel("recursos.materiais",["Contratada","Cliente","Não se aplica"]))}${fld("Valor mensal para materiais (R$)",inp("recursos.valorMateriais",{mode:"decimal",ph:"Ex.: 1.600,00"}))}</div>
+    ${fld("Descartáveis (papel, sabonete)",sel("recursos.descartaveis",["Cliente","Contratada","Não se aplica"]))}
+    <div class="grid2">${fld("Tratamento de piso (m²)",inp("recursos.pisoTrat",{mode:"decimal",ph:"Área para enceramento/cristalização"}))}${fld("Uniforme",sel("recursos.uniforme",["Padrão Verzani","Padrão do cliente","Especial (descrever nas observações)"]))}</div>
+    ${fld("EPIs específicos do local",inp("recursos.epi",{ph:"Ex.: calçado de segurança, protetor auricular"}))}
+    ${fld("Controle de ponto",sel("recursos.ponto",["Nexti - Facial","Nexti - Biométrico","Relógio do cliente","Não exigido"]))}
+  </div>
+  <h3 class="sec-title">Exigências do cliente</h3>
+  <div class="card"><div class="check-list">${EXIG.map(x=>`<label class="cb"><input type="checkbox" data-arr="recursos.exig" value="${esc(x)}"${r.exig.includes(x)?" checked":""}> ${esc(x)}</label>`).join("")}</div></div>
+  <h3 class="sec-title">Infraestrutura no local</h3>
+  <div class="card"><div class="check-list">${INFRA.map(x=>`<label class="cb"><input type="checkbox" data-arr="recursos.infra" value="${esc(x)}"${r.infra.includes(x)?" checked":""}> ${esc(x)}</label>`).join("")}</div>
+  ${fld("Observações",txt("recursos.obs"))}</div>`;
+}
+function vBeneficios(){
+  return `<h3 class="sec-title">Transporte</h3>
+  <div class="card"><div class="grid2">${fld("Tipo de transporte",sel("beneficios.transporte",["Fretado","Vale-transporte (VT)","Ajuda de custo","Não se aplica"]))}${fld("Valor (R$)",inp("beneficios.transporteValor",{mode:"decimal",ph:"Ex.: 82,50"}))}</div></div>
+  <h3 class="sec-title">Alimentação</h3>
+  <div class="card"><div class="grid2">${fld("Alimentação",sel("beneficios.alimentacao",["VA conforme CCT","Por conta do cliente"]))}${fld("Valor (R$)",inp("beneficios.alimentacaoValor",{mode:"decimal",ph:"Ex.: 31,34"}))}</div></div>
+  <h3 class="sec-title">Saúde e seguro</h3>
+  <div class="card"><div class="grid3">${fld("Convênio médico",sel("beneficios.medico",["Sim","Não","Conforme CCT"]))}${fld("Convênio odontológico",sel("beneficios.odonto",["Sim","Não","Conforme CCT"]))}${fld("Seguro de vida",sel("beneficios.seguro",["Sim","Não"]))}</div></div>
+  <h3 class="sec-title">Cesta básica e assiduidade</h3>
+  <div class="card"><div class="grid2">${fld("Cesta básica",sel("beneficios.cesta",["Sim","Não"]))}${fld("Valor (R$)",inp("beneficios.cestaValor",{mode:"decimal",ph:"Ex.: 200,00"}))}</div>
+  <div class="grid2">${fld("Prêmio assiduidade",sel("beneficios.assiduidade",["Sim","Não"]))}${fld("Valor (R$)",inp("beneficios.assiduidadeValor",{mode:"decimal",ph:"Ex.: 400,00"}))}</div></div>
+  <h3 class="sec-title">Benefício adicional</h3>
+  <div class="card">${fld("Descrição",txt("beneficios.adicional",{ph:"Ex.: cesta básica, prêmio assiduidade, auxílio creche"}))}</div>`;
+}
+function vFechamento(){
+  const al=alertas();
+  return `${al.length?`<div class="stack">${al.map(a=>`<div class="note ${a.k}">${esc(a.t)}</div>`).join("")}</div>`:""}
+  <div class="card">
+    ${fld("Pontos críticos e riscos",txt("fechamento.criticos",{ph:"O que pode pesar no preço ou na operação"}))}
+    ${fld("Observações gerais",txt("fechamento.obs"))}
+    ${fld("Prazo para enviar a proposta",inp("fechamento.prazo",{type:"date"}))}
+  </div>
+  <h3 class="sec-title">Fotos do local (até 4)</h3>
+  <div class="card">${photoGrid("geral",S.fechamento.fotos)}</div>`;
+}
+function pendencias(){
+  const p=[];
+  if(!S.visita.cliente.trim())p.push("Informe o cliente (etapa Visita).");
+  if(!S.visita.cidade.trim())p.push("Informe a cidade (etapa Visita).");
+  if(!isEdital()&&!S.postos.length)p.push("Inclua pelo menos um posto (etapa Postos).");
+  if(!destinatarios().length)p.push("Escolha pelo menos um destinatário.");
+  return p;
+}
+function vEnviar(){
+  const t=totais(), pend=pendencias();
+  return `${S.exemplo?`<div class="note warn"><b>Esta é a visita de exemplo.</b> Se enviar agora, o e-mail sai com os dados de exemplo.</div>`:""}
+  <div class="tiles"><div class="tile"><span>Efetivo</span><b>${isEdital()?"Edital":fmtN(t.efetivo)}</b></div><div class="tile"><span>Área (m²)</span><b>${fmtN(t.m2)}</b></div><div class="tile"><span>Equipamentos</span><b>${fmtN(t.equip)}</b></div><div class="tile"><span>Fotos</span><b>${t.fotos}</b></div></div>
+  <div class="card">
+    <div class="grid2"><div><span class="muted">Cliente</span><br><b>${esc(S.visita.cliente||"—")}</b> ${S.visita.unidade?"· "+esc(S.visita.unidade):""}</div><div><span class="muted">Local e data</span><br><b>${esc([S.visita.cidade,S.visita.uf].filter(Boolean).join("/")||"—")}</b> · ${fmtData(S.visita.data)}</div></div>
+  </div>
+  <h3 class="sec-title">Destinatários cadastrados</h3>
+  <div class="card" style="gap:0">
+    ${CFG.dest.map((d,i)=>`<div class="rcpt"><label><input type="checkbox" data-dest="${i}"${d.on?" checked":""}><span class="who"><b>${esc(d.nome||d.email)}</b><small>${esc(d.email)}</small></span></label><button class="btn ghost" type="button" data-deldest="${i}" aria-label="Remover ${esc(d.email)}">Remover</button></div>`).join("")||`<p class="muted">Nenhum e-mail cadastrado.</p>`}
+    <div class="row" style="padding-top:12px"><input id="newDestNome" placeholder="Nome (opcional)"><input id="newDestEmail" type="email" placeholder="email@empresa.com.br"><button class="btn" type="button" id="addDest" style="flex:0 0 auto">Cadastrar</button></div>
+  </div>
+  <div class="card">
+    ${fld("E-mails só para esta visita","<input id='extras' type='text' placeholder='Separe por vírgula' value='"+esc(S.extras||"")+"'>")}
+  </div>
+  ${pend.length?`<div class="note warn"><b>Antes de enviar:</b>${pend.map(x=>`<span>• ${esc(x)}</span>`).join("")}</div>`:""}
+  <div class="actions">
+    <button class="btn primary" type="button" id="btnSend"${pend.length||sending?" disabled":""}>${sending?"Enviando…":"Finalizar e enviar por e-mail"}</button>
+    <div class="row"><button class="btn" type="button" id="btnPdf">Baixar PDF</button><button class="btn" type="button" id="btnXlsx">Baixar planilha para a PAC</button></div>
+    ${navigator.share?`<button class="btn" type="button" id="btnShare">Compartilhar PDF (Outlook, WhatsApp…)</button>`:""}
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite">${lastStatus?`<div class="note ${lastStatus.k}">${lastStatus.h}</div>`:""}</div>
+  ${!CFG.url||!CFG.chave?`<div class="note warn"><b>O envio automático ainda não está configurado.</b><span>Abra <b>Ajustes</b> e cole o endereço do serviço de envio e a chave.</span></div>`:`<div class="note info">Sem internet, o relatório fica na fila e é enviado sozinho quando a conexão voltar. O e-mail sai da conta Google configurada no serviço de envio, com o PDF e a planilha anexados.</div>`}
+  ${S.status==="enviada"?`<div class="note ok">Esta visita já foi enviada em ${fmtDH(S.enviadoEm)}. Enviar de novo manda outro e-mail.</div>`:S.status==="fila"?`<div class="note warn">Esta visita está na fila, aguardando internet para ser enviada.</div>`:""}
+  <div class="row" style="margin-top:8px"><button class="btn" type="button" id="btnNova">Começar nova visita</button></div>`;
+}
+const VIEWS=[vVisita,vAreas,vPostos,vBeneficios,vRecursos,vFechamento,vEnviar];
+
+function render(keepScroll){
+  document.getElementById("hVisitas").setAttribute("aria-pressed",tela==="lista");document.getElementById("hInicio").setAttribute("aria-pressed",tela==="capa");
+  document.getElementById("hAjustes").setAttribute("aria-pressed",tela==="config");
+  const nav=document.getElementById("steps"),bar=document.getElementById("bar");
+  nav.hidden=tela!=="form";bar.hidden=tela!=="form";
+  const capaEl=document.getElementById("capa"),topo=document.querySelector("header.top"),mainEl=document.getElementById("main");
+  capaEl.hidden=tela!=="capa";topo.hidden=tela==="capa";mainEl.hidden=tela==="capa";
+  if(tela==="capa"){renderCapa();return}
+  if(tela==="lista"){renderLista(keepScroll);return}
+  if(tela==="config"){renderConfig(keepScroll);return}
+  document.getElementById("steps").innerHTML=STEPS.map((s,i)=>`<button type="button" data-step="${i}"${i===step?' aria-current="step"':""}><span class="n">${i+1}</span>${s.t}</button>`).join("");
+  const st=STEPS[step];
+  const banner=S.exemplo&&step<STEPS.length-1?`<div class="banner"><span><b>Visita de exemplo</b>, com dados da PAC. Use para conhecer o app.</span><button class="btn" type="button" id="btnLimpar">Começar nova visita</button></div>`:"";
+  const m=document.getElementById("main");
+  m.innerHTML=`<div class="step-enter">${banner}<div class="stephead"><h2>${st.h}</h2><p>${st.p}</p></div><div class="stack">${VIEWS[step]()}</div></div>`;
+  document.getElementById("btnPrev").disabled=step===0;
+  const nx=document.getElementById("btnNext"); nx.hidden=step===STEPS.length-1;
+  nx.textContent=step===STEPS.length-2?"Revisar e enviar":"Próximo";
+  document.getElementById("hdrSub").textContent=(S.visita.cliente?S.visita.cliente+" · ":"")+"Pré-proposta";
+  if(!keepScroll)window.scrollTo(0,0);
+  const cur=document.querySelector('nav.steps [aria-current]'); cur&&cur.scrollIntoView({block:"nearest",inline:"nearest"});
+}
+function go(i){step=Math.max(0,Math.min(STEPS.length-1,i));render()}
+
+/* ---------- eventos ---------- */
+document.addEventListener("input",e=>{
+  const el=e.target;
+  if(el.dataset.k){setPath(el.dataset.k,el.value);persist();if(el.dataset.k==="visita.cliente")document.getElementById("hdrSub").textContent=(el.value?el.value+" · ":"")+"Pré-proposta";return}
+  if(el.dataset.l&&el.type!=="checkbox"){const it=S[el.dataset.l].find(x=>x.id===el.dataset.i);if(it){it[el.dataset.f]=el.value;persist()}return}
+  if(el.id==="extras"){S.extras=el.value;persist()}
+});
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.dataset.k==="quadro.origem"){setPath("quadro.origem",el.value);persist();rerenderKeep();return}
+  if(el.dataset.arr){const arr=getPath(el.dataset.arr);const i=arr.indexOf(el.value);if(el.checked&&i<0)arr.push(el.value);if(!el.checked&&i>=0)arr.splice(i,1);persist();return}
+  if(el.dataset.l){const it=S[el.dataset.l].find(x=>x.id===el.dataset.i);if(!it)return;it[el.dataset.f]=el.type==="checkbox"?el.checked:el.value;if(el.dataset.l==="postos"&&el.dataset.f==="escala")it.colab=String(ESCALAS[it.escala]??1);persist();
+    if(el.dataset.re)rerenderKeep(el.id);else updateItem(el,it);return}
+  if(el.dataset.dest!=null){CFG.dest[+el.dataset.dest].on=el.checked;salvaCfg();rerenderKeep();return}
+  if(el.id==="ccCliente"){S.ccCliente=el.checked;persist();return}
+  if(el.dataset.addph){addPhotos(el.dataset.addph,[...el.files]);el.value=""}
+});
+function updateItem(el,it){
+  const box=el.closest(".item");if(!box)return;
+  const b=box.querySelector(".item-head b");
+  if(b&&el.dataset.l==="areas"&&el.dataset.f==="nome")b.textContent=it.nome||"Ambiente";
+  if(b&&el.dataset.l==="postos"&&el.dataset.f==="cargo")b.textContent=it.cargo||"Posto";
+  if(el.dataset.l==="postos"){const c=calcPosto(it),k=box.querySelector(".calc");if(k)k.innerHTML=c?`<span class="pill">${hm(c.trab)} trabalhadas/dia</span>${c.not?`<span class="pill warn">${hm(c.not)} noturnas</span>`:""}<span class="pill ok">Efetivo ${fmtN(c.efetivo)} (${esc(it.qtd)} posto${num(it.qtd)===1?"":"s"} × ${fmtN(c.fator)})</span>`:`<span class="pill">Informe entrada e saída</span>`}
+}
+function rerenderKeep(focusId){const y=window.scrollY;render(true);window.scrollTo(0,y);if(focusId){const f=document.getElementById(focusId);f&&f.focus({preventScroll:true})}}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.step!=null)return go(+b.dataset.step);
+  if(b.id==="btnPrev")return go(step-1);
+  if(b.id==="btnNext")return go(step+1);
+  if(b.id==="btnLimpar"||b.id==="btnNova"||b.id==="lNova")return novaVisita();
+  if(b.id==="cNova")return novaVisita();
+  if(b.id==="cContinuar"){tela="form";return render()}
+  if(b.id==="cVisitas"){tela="lista";return render()}
+  if(b.id==="cAjustes"){tela="config";return render()}
+  if(b.id==="hInicio"){salvarAgora();lastStatus=null;tela="capa";return render()}
+  if(b.id==="hVisitas"){salvarAgora();lastStatus=null;tela=tela==="lista"?"form":"lista";return render()}
+  if(b.id==="hAjustes"){salvarAgora();lastStatus=null;tela=tela==="config"?"form":"config";return render()}
+  if(b.id==="voltarForm"){tela="form";return render()}
+  if(b.dataset.abrir)return abrirVisita(b.dataset.abrir);
+  if(b.dataset.dup)return duplicarVisita(b.dataset.dup);
+  if(b.dataset.exc)return pedirExclusao(b);
+  if(b.dataset.excok)return excluirVisita(b.dataset.excok);
+  if(b.id==="excNao")return render(true);
+  if(b.id==="filaAgora")return processarFila().then(()=>render(true));
+  if(b.id==="cfgSalvar")return salvarAjustes();
+  if(b.id==="cfgTestar")return testarEnvio();
+  if(b.id==="btnShare")return compartilhar();
+  if(b.dataset.add){const l=b.dataset.add;const it={id:uid()};
+    if(l==="areas")Object.assign(it,{nome:"",tipo:"Escritório",m2:"",piso:"Porcelanato",freq:"Diária",fluxo:"Médio",altura:false,obs:"",fotos:[]});
+    if(l==="postos"){const prev=S.postos[S.postos.length-1];Object.assign(it,{qtd:1,cargo:"",escala:prev?.escala||"5x2",colab:prev?String(colabDe(prev)):"1",ent:prev?.ent||"07:00",sai:prev?.sai||"16:20",int:prev?.int||"60",feriados:"Não",insal:"N/A",peric:"Não",acumulo:"Não",acumuloDesc:"",salario:"CCT",salarioValor:"",obs:""})}
+    if(l==="equipamentos")Object.assign(it,{item:"",qtd:1,tipo:"Compra",obs:""});
+    S[l].push(it);persist();rerenderKeep();const f=document.querySelector(`[data-i="${it.id}"]`);f&&f.closest(".item").scrollIntoView({behavior:"smooth",block:"center"});return}
+  if(b.dataset.del){S[b.dataset.del]=S[b.dataset.del].filter(x=>x.id!==b.dataset.i);persist();return rerenderKeep()}
+  if(b.dataset.delph){const arr=photoArr(b.dataset.delph);const i=arr.findIndex(p=>p.id===b.dataset.pid);if(i>=0)arr.splice(i,1);persist();return rerenderKeep()}
+  if(b.id==="sigClear"){S.fechamento.assinatura="";persist();initSig();return}
+  if(b.id==="addDest")return addDest();
+  if(b.dataset.deldest!=null){CFG.dest.splice(+b.dataset.deldest,1);salvaCfg();return rerenderKeep()}
+  if(b.id==="btnSend")return enviar();
+  if(b.id==="btnPdf")return baixarPdf();
+  if(b.id==="btnXlsx")return baixarXlsx();
+});
+function askReset(b){
+  const box=document.createElement("div");box.className="note warn";box.style.marginTop="8px";
+  box.innerHTML=`<b>Apagar tudo o que está preenchido e começar do zero?</b><div class="row" style="margin-top:6px"><button class="btn primary" type="button" id="confirmReset">Sim, começar em branco</button><button class="btn" type="button" id="cancelReset">Manter</button></div>`;
+  b.replaceWith(box);
+}
+function addDest(){
+  const em=document.getElementById("newDestEmail").value.trim(),nm=document.getElementById("newDestNome").value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){setStatus("err","Digite um e-mail válido para cadastrar.");return}
+  if(CFG.dest.some(d=>d.email.toLowerCase()===em.toLowerCase())){setStatus("warn","Esse e-mail já está cadastrado.");return}
+  CFG.dest.push({email:em,nome:nm,on:true});salvaCfg();lastStatus=null;rerenderKeep();
+}
+function destinatarios(){
+  const set=new Set(CFG.dest.filter(d=>d.on).map(d=>d.email.trim().toLowerCase()));
+  (S.extras||"").split(/[,;\s]+/).map(x=>x.trim().toLowerCase()).filter(x=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x)).forEach(x=>set.add(x));
+  return [...set];
+}
+
+/* ---------- fotos ---------- */
+function photoArr(scope){if(scope==="geral")return S.fechamento.fotos;const a=S.areas.find(x=>x.id===scope.split(":")[1]);return a?a.fotos:[]}
+function compress(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=1000;let w=img.naturalWidth,h=img.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);res({id:uid(),src:c.toDataURL("image/jpeg",0.55),w,h})};img.onerror=rej;img.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+async function addPhotos(scope,files){
+  const arr=photoArr(scope);
+  for(const f of files){if(arr.length>=MAX_FOTOS)break;try{arr.push(await compress(f))}catch(e){}}
+  persist();rerenderKeep();
+}
+
+/* ---------- assinatura ---------- */
+function initSig(){
+  const c=document.getElementById("sig");if(!c)return;
+  const dpr=window.devicePixelRatio||1,rect=c.getBoundingClientRect();
+  c.width=Math.round(rect.width*dpr);c.height=Math.round(rect.height*dpr);
+  const g=c.getContext("2d");g.scale(dpr,dpr);g.lineWidth=2.2;g.lineCap="round";g.lineJoin="round";g.strokeStyle="#16222E";
+  g.fillStyle="#fff";g.fillRect(0,0,rect.width,rect.height);
+  if(S.fechamento.assinatura){const im=new Image();im.onload=()=>g.drawImage(im,0,0,rect.width,rect.height);im.src=S.fechamento.assinatura}
+  else{g.fillStyle="#9AA6B1";g.font="14px Barlow, sans-serif";g.fillText("Assine aqui com o dedo",14,24)}
+  let drawing=false,blankHint=!S.fechamento.assinatura;
+  const pos=e=>{const r=c.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]};
+  c.onpointerdown=e=>{if(blankHint){g.fillStyle="#fff";g.fillRect(0,0,rect.width,rect.height);blankHint=false}drawing=true;c.setPointerCapture(e.pointerId);const [x,y]=pos(e);g.beginPath();g.moveTo(x,y)};
+  c.onpointermove=e=>{if(!drawing)return;const [x,y]=pos(e);g.lineTo(x,y);g.stroke()};
+  c.onpointerup=c.onpointercancel=()=>{if(!drawing)return;drawing=false;S.fechamento.assinatura=c.toDataURL("image/png");persist()};
+}
+
+/* ---------- status ---------- */
+function setStatus(k,h){lastStatus={k,h};const s=document.getElementById("status");if(s)s.innerHTML=`<div class="note ${k}">${h}</div>`}
+
+/* ---------- PDF ---------- */
+const nomeArquivo=()=>("Visita_"+(S.visita.cliente||"cliente")+"_"+(S.visita.unidade||"")+"_"+(S.visita.data||hoje())).normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9_-]+/g,"_").replace(/_+/g,"_").replace(/_$/,"");
+function gerarPdf(fx,semFotos){
+  const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:"mm",format:"a4",compress:true});
+  const W=210,M=14,BRAND=[0,52,68],TEAL=[0,136,144],ORANGE=[232,88,32],INK=[24,36,46],MUT=[96,110,122],SOFT=[243,246,247],LINE=[222,229,233];
+  const v=S.visita,t=totais();
+  // cabeçalho
+  try{doc.addImage(LOGO,"PNG",M,8,16*LOGO_R,16)}catch(e){}
+  doc.setTextColor(...BRAND);doc.setFont("helvetica","bold");doc.setFontSize(15);doc.text("RELATÓRIO DE VISITA TÉCNICA",W-M,14,{align:"right"});
+  doc.setFont("helvetica","normal");doc.setFontSize(9);doc.setTextColor(...MUT);doc.text("Pré-proposta · uso interno do comercial",W-M,19.5,{align:"right"});
+  doc.setFillColor(...BRAND);doc.rect(0,29,W,19,"F");
+  doc.setFillColor(...TEAL);doc.rect(0,48,W*0.68,1.4,"F");doc.setFillColor(...ORANGE);doc.rect(W*0.68,48,W*0.32,1.4,"F");
+  doc.setTextColor(255);doc.setFont("helvetica","bold");doc.setFontSize(14);doc.text(doc.splitTextToSize((v.cliente||"Cliente")+(v.unidade?" · "+v.unidade:""),120)[0],M,37);
+  doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text([[v.cidade,v.uf].filter(Boolean).join("/"),v.segmento].filter(Boolean).join(" · ")||" ",M,43);
+  doc.setFontSize(8);doc.text("DATA DA VISITA",W-M,35.5,{align:"right"});doc.setFont("helvetica","bold");doc.setFontSize(12);doc.text(fmtData(v.data)||"—",W-M,41.5,{align:"right"});
+  doc.setFont("helvetica","normal");doc.setFontSize(8);doc.text(v.servicos.join(" · ")||"",W-M,45.5,{align:"right"});
+  let y=56,nsec=0;
+  const sec=title=>{if(y>258){doc.addPage();y=18}nsec++;doc.setFillColor(...TEAL);doc.roundedRect(M,y-4.6,6.2,6.2,1.2,1.2,"F");doc.setTextColor(255);doc.setFont("helvetica","bold");doc.setFontSize(9);doc.text(String(nsec),M+3.1,y-0.3,{align:"center"});
+    doc.setTextColor(...BRAND);doc.setFontSize(11.5);doc.text(title.toUpperCase(),M+9,y);doc.setDrawColor(...LINE);doc.setLineWidth(.3);doc.line(M+9+doc.getTextWidth(title.toUpperCase())+3,y-1.4,W-M,y-1.4);y+=5;doc.setTextColor(...INK)};
+  const tbl=(head,body,opts={})=>{doc.autoTable(Object.assign({startY:y,head:head?[head]:undefined,body,margin:{left:M,right:M,bottom:18},styles:{font:"helvetica",fontSize:8.8,cellPadding:{top:2.1,bottom:2.1,left:2.4,right:2.4},textColor:INK,lineColor:LINE,lineWidth:{bottom:.2,top:0,left:0,right:0}},headStyles:{fillColor:BRAND,textColor:255,fontStyle:"bold",fontSize:8.2,lineWidth:0},alternateRowStyles:{fillColor:SOFT},footStyles:{fillColor:[230,240,241],textColor:BRAND,fontStyle:"bold",lineWidth:0},theme:"plain"},opts));y=doc.lastAutoTable.finalY+8};
+  const kv={0:{fontStyle:"bold",textColor:MUT,fillColor:SOFT}};
+  // resumo
+  const boxes=[["Efetivo",isEdital()?"Edital":fmtN(t.efetivo),TEAL],["Postos",isEdital()?"Edital":fmtN(t.postos),TEAL],["Área levantada",fmtN(t.m2)+" m2",TEAL],["Equipamentos",fmtN(t.equip),TEAL],["Materiais/mês",brl(S.recursos.valorMateriais)||"—",ORANGE]];
+  const gap=3,bw=(W-2*M-gap*4)/5;boxes.forEach((b,i)=>{const x=M+i*(bw+gap);doc.setFillColor(...SOFT);doc.rect(x,y,bw,17,"F");doc.setFillColor(...b[2]);doc.rect(x,y,bw,1.2,"F");doc.setTextColor(...MUT);doc.setFont("helvetica","bold");doc.setFontSize(6.8);doc.text(b[0].toUpperCase(),x+3,y+6.5);doc.setTextColor(...BRAND);doc.setFontSize(b[1].length>11?10:13);doc.text(b[1],x+3,y+13.5)});
+  y+=27;
+  sec("Dados da visita");
+  tbl(null,[["Cliente",v.cliente,"Unidade",v.unidade],["Endereço",v.endereco,"Cidade/UF",[v.cidade,v.uf].filter(Boolean).join("/")],["Segmento",v.segmento,"Área construída",v.areaTotal?v.areaTotal+" m2":""],["Resp. comercial",v.respComercial,"Visita feita por",v.tecnico],["Acompanhante",[v.contatoNome,v.contatoCargo].filter(Boolean).join(" · "),"Contato",[v.contatoTel,v.contatoEmail].filter(Boolean).join(" · ")],["Funcionamento",v.funcionamento,"Início desejado",fmtData(v.inicio)],["Prestador atual",v.fornecedorAtual,"Motivo",v.motivo]].map(r=>r.map(x=>x||"—")),{columnStyles:{0:{fontStyle:"bold",cellWidth:30,textColor:MUT,fillColor:SOFT},2:{fontStyle:"bold",cellWidth:30,textColor:MUT,fillColor:SOFT}},alternateRowStyles:{}});
+  sec("Quadro de pessoal");
+  if(isEdital()){tbl(null,[["Origem do quadro","Edital: o cliente já tem o quadro de pessoal projetado"],["Referência",S.quadro.edital||"—"]],{columnStyles:{0:{fontStyle:"bold",cellWidth:48,textColor:MUT,fillColor:SOFT}},alternateRowStyles:{}})}
+  else if(S.postos.length){tbl(["Post.","Qtd","Efet.","Cargo","Escala","Horário","Int.","H/dia","Not.","Salário","Fer.","Insal.","Peric.","Acúm."],S.postos.map(p=>{const c=calcPosto(p);return [p.qtd,fmtN(colabDe(p)),fmtN(num(p.qtd)*colabDe(p)),p.cargo,escalaDe(p),p.ent+"–"+p.sai,p.int==="0"?"—":p.int+" min",c?hm(c.trab):"",c&&c.not?hm(c.not):"—",(p.salario||"CCT")==="Sugestão"?(brl(p.salarioValor)||"Sugestão"):"CCT",p.feriados,p.insal==="N/A"?"—":p.insal.split(" ")[0],p.peric==="Sim"?"30%":"—",p.acumulo==="Sim"?"Sim":"—"]}),{columnStyles:{0:{cellWidth:9,halign:"center"},1:{cellWidth:8,halign:"center"},2:{cellWidth:9,halign:"center"},4:{cellWidth:12},5:{cellWidth:19},6:{cellWidth:11.5},7:{cellWidth:10},8:{cellWidth:9},9:{cellWidth:18},10:{cellWidth:9},11:{cellWidth:10},12:{cellWidth:10},13:{cellWidth:10}},headStyles:{fillColor:BRAND,textColor:255,fontStyle:"bold",fontSize:7,cellPadding:1.4,lineWidth:0},styles:{font:"helvetica",fontSize:6.9,cellPadding:1.4,textColor:INK,lineColor:LINE,lineWidth:{bottom:.2,top:0,left:0,right:0}},foot:[[fmtN(t.postos),"",fmtN(t.efetivo),"Total","","","","","","","","","",""]]});
+    const obsP=S.postos.filter(p=>p.acumulo==="Sim").map(p=>"• Acúmulo "+p.cargo+": "+(p.acumuloDesc||"sim")).concat(S.postos.filter(p=>p.obs).map(p=>"• "+p.cargo+": "+p.obs));if(obsP.length){doc.setFont("helvetica","normal");doc.setTextColor(...MUT);doc.setFontSize(8.5);const l=doc.splitTextToSize(obsP.join("\n"),W-2*M);doc.text(l,M,y-3);y+=l.length*4;doc.setTextColor(...INK)}}
+  else{doc.setFontSize(10);doc.text("Nenhum posto informado.",M,y);y+=8}
+  sec("Áreas e ambientes");
+  if(S.areas.length)tbl(["Ambiente","Tipo","m2","Piso","Frequência","Fluxo","Altura"],S.areas.map(a=>[a.nome||"—",a.tipo,a.m2||"—",a.piso,a.freq,a.fluxo,a.altura?"Sim":"—"]),{foot:[["Total","",fmtN(t.m2),"","","",""]]});
+  else{doc.setFontSize(10);doc.text("Nenhum ambiente informado.",M,y);y+=8}
+  sec("Equipamentos");
+  if(S.equipamentos.length)tbl(["Equipamento","Qtd","Aquisição","Observação"],S.equipamentos.map(e=>[e.item||"—",e.qtd,e.tipo,e.obs||"—"]),{columnStyles:{0:{cellWidth:72},1:{halign:"center",cellWidth:14},2:{cellWidth:24}}});
+  else{doc.setFontSize(10);doc.text("Nenhum equipamento informado.",M,y);y+=8}
+  const r=S.recursos;
+  sec("Insumos, ponto e exigências");
+  tbl(null,[["Materiais de limpeza",r.materiais],["Valor mensal para materiais",brl(r.valorMateriais)||"—"],["Descartáveis",r.descartaveis],["Tratamento de piso",r.pisoTrat?r.pisoTrat+" m2":"—"],["Uniforme",r.uniforme],["EPIs específicos",r.epi||"—"],["Controle de ponto",r.ponto],["Exigências",r.exig.join("; ")||"—"],["Infraestrutura no local",r.infra.join("; ")||"—"],["Observações",r.obs||"—"]],{columnStyles:{0:{fontStyle:"bold",cellWidth:48,textColor:MUT,fillColor:SOFT}},alternateRowStyles:{}});
+  const bn=S.beneficios;
+  sec("Benefícios");
+  tbl(null,[["Transporte",bn.transporte,brl(bn.transporteValor)||"—"],["Alimentação",bn.alimentacao,brl(bn.alimentacaoValor)||"—"],["Convênio médico",bn.medico,""],["Convênio odontológico",bn.odonto,""],["Seguro de vida",bn.seguro,""],["Cesta básica",bn.cesta,bn.cesta==="Sim"?(brl(bn.cestaValor)||"—"):""],["Prêmio assiduidade",bn.assiduidade,bn.assiduidade==="Sim"?(brl(bn.assiduidadeValor)||"—"):""],["Benefício adicional",bn.adicional||"—",""]],{columnStyles:{0:{fontStyle:"bold",cellWidth:48,textColor:MUT,fillColor:SOFT},2:{halign:"right",cellWidth:32,fontStyle:"bold"}},alternateRowStyles:{}});
+  const al=alertas();
+  sec("Pontos críticos e observações");
+  const bloc=[];if(S.fechamento.criticos)bloc.push(["Pontos críticos",S.fechamento.criticos]);if(S.fechamento.obs)bloc.push(["Observações gerais",S.fechamento.obs]);if(S.fechamento.prazo)bloc.push(["Prazo da proposta",fmtData(S.fechamento.prazo)]);al.forEach(a=>bloc.push(["Atenção",a.t]));
+  if(bloc.length)tbl(null,bloc,{columnStyles:{0:{fontStyle:"bold",cellWidth:38,textColor:MUT,fillColor:SOFT}},alternateRowStyles:{}});else{doc.setFontSize(10);doc.text("—",M,y);y+=8}
+  // fotos
+  const grupos=S.fechamento.fotos.length?[["Fotos do local",S.fechamento.fotos.slice(0,MAX_FOTOS)]]:[];
+  if(grupos.length&&semFotos){if(y>270){doc.addPage();y=18}doc.setFontSize(9);doc.setTextColor(...MUT);doc.text("Registro fotográfico enviado à parte ("+totais().fotos+" fotos).",M,y);y+=8}
+  if(grupos.length&&!semFotos){doc.addPage();y=18;sec("Registro fotográfico");
+    const cw=(W-2*M-6)/2,ch=cw*0.75;
+    grupos.forEach(([nome,fotos])=>{if(y+ch+10>285){doc.addPage();y=18}doc.setFont("helvetica","bold");doc.setFontSize(10);doc.setTextColor(...INK);doc.text(nome,M,y);y+=3;
+      fotos.forEach((f0,i)=>{const f=fx?(fx(f0)||f0):f0;const col=i%2;if(col===0&&i>0)y+=ch+4;if(y+ch>285){doc.addPage();y=18}const x=M+col*(cw+6);
+        const k=Math.min(cw/f.w,ch/f.h),w=f.w*k,h=f.h*k;doc.setFillColor(...SOFT);doc.rect(x,y,cw,ch,"F");try{doc.addImage(f.src,"JPEG",x+(cw-w)/2,y+(ch-h)/2,w,h)}catch(e){}});
+      y+=ch+9});
+  }
+  if(y>270){doc.addPage();y=18}
+  doc.setFontSize(9);doc.setTextColor(...MUT);doc.setFont("helvetica","normal");doc.text("Visita técnica realizada por "+(v.tecnico||"—")+" · documento de uso interno do comercial",M,y+2);
+  const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setDrawColor(...LINE);doc.setLineWidth(.3);doc.line(M,281,W-M,281);try{doc.addImage(LOGO,"PNG",M,283.2,8*LOGO_R,8)}catch(e){}const tx=M+8*LOGO_R+4;doc.setFont("helvetica","normal");doc.setFontSize(7.5);doc.setTextColor(...MUT);doc.text("Visita técnica · "+(v.cliente||"")+" · "+fmtData(v.data),tx,286.6);doc.text("Desenvolvedor: Luciano Evaristo · Versão "+APP_VERSAO,tx,290.4);doc.setFont("helvetica","bold");doc.setTextColor(...BRAND);doc.text(i+" / "+n,W-M,288.5,{align:"right"})}
+  return doc.output("blob");
+}
+
+/* ---------- planilha para a PAC ---------- */
+function gerarWb(){
+  const wb=XLSX.utils.book_new(),v=S.visita;
+  const qp=[["POSTOS","QTD","EFETIVO","CARGO","ESCALA","ENTRADA","SAÍDA","INTERVALO (min)","HORAS/DIA","HORAS NOTURNAS","FERIADOS","INSALUBRIDADE","PERICULOSIDADE","ACÚMULO","DESCRIÇÃO ACÚMULO","SALÁRIO","SALÁRIO SUGERIDO (R$)","OBSERVAÇÃO"]];
+  if(isEdital())qp.push(["Quadro conforme edital do cliente"+(S.quadro.edital?": "+S.quadro.edital:"")]);
+  postosAtivos().forEach(p=>{const c=calcPosto(p);qp.push([num(p.qtd),colabDe(p),num(p.qtd)*colabDe(p),p.cargo,escalaDe(p),p.ent,p.sai,num(p.int),c?+(c.trab/60).toFixed(2):"",c?+(c.not/60).toFixed(2):"",p.feriados,p.insal,p.peric==="Sim"?"30%":"Não",p.acumulo||"Não",p.acumuloDesc||"",p.salario||"CCT",(p.salario||"CCT")==="Sugestão"?(num(p.salarioValor)||""):"",p.obs])});
+  const s1=XLSX.utils.aoa_to_sheet(qp);s1["!cols"]=[8,12,8,28,14,9,9,10,10,12,9,14,14,10,30,10,14,30].map(w=>({wch:w}));XLSX.utils.book_append_sheet(wb,s1,"Quadro de Pessoal");
+  const eq=[["ITEM","QTDE","TIPO","OBSERVAÇÃO"]];S.equipamentos.forEach(e=>eq.push([e.item,num(e.qtd),e.tipo,e.obs||""]));
+  const s2=XLSX.utils.aoa_to_sheet(eq);s2["!cols"]=[{wch:50},{wch:8},{wch:12},{wch:40}];XLSX.utils.book_append_sheet(wb,s2,"Equipamentos");
+  const ar=[["AMBIENTE","TIPO","M²","PISO","FREQUÊNCIA","FLUXO","ALTURA > 2M","OBSERVAÇÃO"]];S.areas.forEach(a=>ar.push([a.nome,a.tipo,num(a.m2),a.piso,a.freq,a.fluxo,a.altura?"Sim":"Não",a.obs]));
+  const s3=XLSX.utils.aoa_to_sheet(ar);s3["!cols"]=[30,18,10,16,18,8,12,40].map(w=>({wch:w}));XLSX.utils.book_append_sheet(wb,s3,"Áreas");
+  const r=S.recursos;
+  const dg=[["CAMPO","VALOR"],["Cliente",v.cliente],["Unidade",v.unidade],["Endereço",v.endereco],["Cidade",v.cidade],["UF",v.uf],["Serviços",v.servicos.join(", ")],["Segmento",v.segmento],["Data da visita",fmtData(v.data)],["Resp. comercial",v.respComercial],["Visita feita por",v.tecnico],["Acompanhante",v.contatoNome],["Cargo",v.contatoCargo],["Telefone",v.contatoTel],["E-mail",v.contatoEmail],["Área construída (m²)",v.areaTotal],["Funcionamento",v.funcionamento],["Início desejado",fmtData(v.inicio)],["Prestador atual",v.fornecedorAtual],["Motivo",v.motivo],["Materiais de limpeza",r.materiais],["Valor mensal materiais (R$)",num(r.valorMateriais)||""],["Descartáveis",r.descartaveis],["Tratamento de piso (m²)",r.pisoTrat],["Uniforme",r.uniforme],["EPIs",r.epi],["Controle de ponto",r.ponto],["Exigências",r.exig.join("; ")],["Infraestrutura",r.infra.join("; ")],["Pontos críticos",S.fechamento.criticos],["Observações",S.fechamento.obs],["Prazo da proposta",fmtData(S.fechamento.prazo)]];
+  const bn=S.beneficios;
+  const be=[["BENEFÍCIO","OPÇÃO","VALOR (R$)"],["Transporte",bn.transporte,num(bn.transporteValor)||""],["Alimentação",bn.alimentacao,num(bn.alimentacaoValor)||""],["Convênio médico",bn.medico,""],["Convênio odontológico",bn.odonto,""],["Seguro de vida",bn.seguro,""],["Cesta básica",bn.cesta,bn.cesta==="Sim"?(num(bn.cestaValor)||""):""],["Prêmio assiduidade",bn.assiduidade,bn.assiduidade==="Sim"?(num(bn.assiduidadeValor)||""):""],["Benefício adicional",bn.adicional,""]];
+  const s5=XLSX.utils.aoa_to_sheet(be);s5["!cols"]=[{wch:24},{wch:50},{wch:12}];XLSX.utils.book_append_sheet(wb,s5,"Benefícios");
+  const s4=XLSX.utils.aoa_to_sheet(dg);s4["!cols"]=[{wch:26},{wch:70}];XLSX.utils.book_append_sheet(wb,s4,"Dados da Visita");
+  return wb;
+}
+
+/* ---------- arquivos ---------- */
+async function salvarArquivo(filename,data){
+  const blob=data instanceof Blob?data:new Blob([data]);
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),5000);
+  setStatus("ok","Arquivo <b>"+esc(filename)+"</b> gerado.");
+}
+async function compartilhar(){
+  try{setStatus("info","Gerando PDF…");const r=await pdfParaEmail(0);const file=new File([r.pdf],nomeArquivo()+".pdf",{type:"application/pdf"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Visita técnica",text:"Visita técnica · "+(S.visita.cliente||"")});setStatus("ok","PDF compartilhado.")}
+    else setStatus("info","Este aparelho não permite compartilhar arquivos. Use <b>Baixar PDF</b>.")}
+  catch(e){if(e&&e.name==="AbortError")setStatus("info","Compartilhamento cancelado.");else setStatus("err","Não foi possível compartilhar: "+esc(e.message||e))}
+}
+async function baixarPdf(){setStatus("info","Gerando PDF…");try{const r=await pdfParaEmail(0,(i,n)=>setStatus("info","Otimizando as fotos ("+i+" de "+n+")…"));await salvarArquivo(nomeArquivo()+".pdf",r.semFotos?gerarPdf():r.pdf)}catch(e){setStatus("err","Falha ao gerar o PDF: "+esc(e.message||e))}}
+async function baixarXlsx(){try{const arr=XLSX.write(gerarWb(),{type:"array",bookType:"xlsx"});await salvarArquivo(nomeArquivo()+"_PAC.xlsx",new Blob([arr]))}catch(e){setStatus("err","Falha ao gerar a planilha: "+esc(e.message||e))}}
+function reencode(f,max,q){return new Promise(res=>{const img=new Image();img.onload=()=>{const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const w=Math.round(img.naturalWidth*k),h=Math.round(img.naturalHeight*k);const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);res({src:c.toDataURL("image/jpeg",q),w,h})};img.onerror=()=>res(f);img.src=f.src})}
+async function pdfReduzido(max,q){const all=S.fechamento.fotos.slice(0,MAX_FOTOS);const m=new Map();for(const f of all)m.set(f.id,await reencode(f,max,q));return gerarPdf(f=>m.get(f.id))}
+const LIM_EMAIL=930000;
+async function pdfParaEmail(extra,onStep){
+  const nFotos=Math.min(S.fechamento.fotos.length,MAX_FOTOS);
+  let pdf,b;
+  if(!nFotos){pdf=gerarPdf();b=await blobB64(pdf);return {pdf,b64:b,semFotos:false,reduzido:false,cabe:b.length+extra<=LIM_EMAIL}}
+  const niveis=[[720,.5],[600,.45],[500,.4],[420,.35],[340,.3]];
+  for(let i=0;i<niveis.length;i++){onStep&&onStep(i+1,niveis.length);pdf=await pdfReduzido(...niveis[i]);b=await blobB64(pdf);if(b.length+extra<=LIM_EMAIL)return {pdf,b64:b,semFotos:false,reduzido:true}}
+  pdf=gerarPdf(null,true);b=await blobB64(pdf);return {pdf,b64:b,semFotos:true,reduzido:true,cabe:b.length+extra<=LIM_EMAIL};
+}
+const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(b)});
+
+function corpoEmail(){
+  const v=S.visita,t=totais();
+  const linhas=postosAtivos().map(p=>{const c=calcPosto(p);return `<tr><td style="padding:4px 8px;border-bottom:1px solid #e3e8ec">${esc(p.qtd)} posto(s) × ${fmtN(colabDe(p))} · ${esc(p.cargo)}</td><td style="padding:4px 8px;border-bottom:1px solid #e3e8ec">${esc(escalaDe(p))}</td><td style="padding:4px 8px;border-bottom:1px solid #e3e8ec">${esc(p.ent)}–${esc(p.sai)}</td><td style="padding:4px 8px;border-bottom:1px solid #e3e8ec">${fmtN(num(p.qtd)*colabDe(p))}</td></tr>`}).join("");
+  const html=`<div style="font-family:Arial,sans-serif;color:#16222E;font-size:14px;line-height:1.5">
+  <div style="background:#003444;color:#fff;padding:14px 18px;border-bottom:3px solid #E85820"><div style="font-size:12px;opacity:.85">VISITA TÉCNICA · PRÉ-PROPOSTA</div><div style="font-size:18px;font-weight:bold">${esc(v.cliente)}${v.unidade?" · "+esc(v.unidade):""}</div></div>
+  <p style="margin:16px 0 8px">Visita realizada em <b>${fmtData(v.data)}</b> em ${esc([v.cidade,v.uf].filter(Boolean).join("/"))} por ${esc(v.tecnico||"—")}. Serviços avaliados: ${esc(v.servicos.join(", ")||"—")}.</p>
+  <p style="margin:0 0 12px"><b>Efetivo levantado:</b> ${fmtN(t.efetivo)} · <b>Área:</b> ${fmtN(t.m2)} m² · <b>Equipamentos:</b> ${fmtN(t.equip)} · <b>Fotos:</b> ${t.fotos}${S.recursos.valorMateriais?` · <b>Materiais/mês:</b> ${esc(brl(S.recursos.valorMateriais))}`:""}</p>
+  ${isEdital()?`<p style="margin:0 0 12px"><b>Quadro de pessoal:</b> conforme edital do cliente${S.quadro.edital?" ("+esc(S.quadro.edital)+")":""}.</p>`:""}${linhas?`<table style="border-collapse:collapse;font-size:13px"><tr style="background:#EEF2F5"><th align="left" style="padding:4px 8px">Posto</th><th align="left" style="padding:4px 8px">Escala</th><th align="left" style="padding:4px 8px">Horário</th><th align="left" style="padding:4px 8px">Efetivo</th></tr>${linhas}</table>`:""}
+  ${S.fechamento.criticos?`<p style="margin:14px 0 4px"><b>Pontos críticos</b></p><p style="margin:0;white-space:pre-line">${esc(S.fechamento.criticos)}</p>`:""}
+  <p style="margin:16px 0 0;color:#5A6977">Em anexo: relatório completo em PDF e planilha com quadro de pessoal, equipamentos e áreas para a PAC.</p><p style="margin:16px 0 0;color:#8A97A3;font-size:12px">Desenvolvedor: Luciano Evaristo · Versão ${APP_VERSAO}</p></div>`;
+  const txtB=`Visita técnica · ${v.cliente} ${v.unidade||""}\nData: ${fmtData(v.data)} · ${[v.cidade,v.uf].filter(Boolean).join("/")}\nEfetivo: ${fmtN(t.efetivo)} · Área: ${fmtN(t.m2)} m²\nRelatório em PDF e planilha para a PAC em anexo.`;
+  return {html,txtB};
+}
+
+async function enviar(){
+  if(sending)return;
+  const pend=pendencias();if(pend.length){setStatus("warn",pend.join("<br>"));return}
+  if(!CFG.url||!CFG.chave){setStatus("warn","Configure o envio em <b>Ajustes</b> antes de enviar: endereço do serviço e chave.");return}
+  const to=destinatarios();
+  sending=true;const btn=document.getElementById("btnSend");btn.disabled=true;btn.textContent="Enviando…";
+  const fim=()=>{sending=false;const b=document.getElementById("btnSend");if(b){b.disabled=!!pendencias().length;b.textContent="Finalizar e enviar por e-mail"}};
+  try{
+    setStatus("info","Gerando o relatório em PDF…");
+    const r=await pdfParaEmail(0,(i,n)=>setStatus("info","Otimizando as fotos ("+i+" de "+n+")…"));
+    const xlsxB64=XLSX.write(gerarWb(),{type:"base64",bookType:"xlsx"});
+    const fn=nomeArquivo();const {html,txtB}=corpoEmail();
+    const item={id:uid(),visitaId:S.id,cliente:S.visita.cliente,criadoEm:new Date().toISOString(),payload:{
+      para:to,assunto:`Visita técnica · ${S.visita.cliente}${S.visita.unidade?" · "+S.visita.unidade:""} · ${fmtData(S.visita.data)}`,html,texto:txtB,nome:CFG.remetente||"Visita Técnica",
+      anexos:[{nome:fn+".pdf",tipo:"application/pdf",base64:r.b64},{nome:fn+"_PAC.xlsx",tipo:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",base64:xlsxB64}]}};
+    await DB.put("fila",item);S.status="fila";await salvarAgora();
+    if(!navigator.onLine){setStatus("warn","<b>Sem internet agora.</b> O relatório ficou na fila e será enviado sozinho quando a conexão voltar.");return fim()}
+    setStatus("info","Enviando para "+esc(to.join(", "))+"…");
+    const res=await processarFila();
+    const ainda=await DB.get("fila",item.id);
+    if(!ainda)setStatus("ok","<b>Relatório enviado</b> para "+esc(to.join(", "))+" ("+fmtN(r.pdf.size/1024)+" KB).");
+    else if(res&&res.erro&&res.erro.servidor)setStatus("err","O serviço de envio recusou: "+esc(res.erro.message)+" O relatório continua na fila.");
+    else setStatus("warn","<b>A conexão falhou.</b> O relatório ficou na fila e será enviado sozinho quando a internet voltar.");
+  }catch(e){setStatus("err","Falha ao preparar o envio: "+esc(e.message||e))}
+  fim();render(true);
+}
+async function chamarServico(corpo){
+  let res;
+  try{res=await fetch(CFG.url,{method:"POST",body:JSON.stringify(Object.assign({token:CFG.chave},corpo))})}
+  catch(e){throw Object.assign(new Error("Sem conexão com o serviço de envio."),{rede:true})}
+  let j;try{j=await res.json()}catch(e){throw Object.assign(new Error("O serviço respondeu de forma inesperada. Confira se o endereço em Ajustes é o da implantação do Apps Script."),{servidor:true})}
+  if(!j.ok)throw Object.assign(new Error(j.erro||"Envio recusado."),{servidor:true});
+  return j;
+}
+let processando=false;
+async function processarFila(){
+  if(processando||!navigator.onLine||!CFG.url||!CFG.chave)return null;
+  processando=true;let enviados=0,erro=null;
+  try{
+    const itens=(await DB.all("fila")).sort((a,b)=>a.criadoEm.localeCompare(b.criadoEm));
+    for(const it of itens){
+      try{
+        await chamarServico(Object.assign({acao:"enviar"},it.payload));
+        await DB.del("fila",it.id);enviados++;
+        const v=await DB.get("visitas",it.visitaId);
+        if(v){v.status="enviada";v.enviadoEm=new Date().toISOString();v.enviadoPara=it.payload.para;await DB.put("visitas",v);if(S&&S.id===v.id){S.status=v.status;S.enviadoEm=v.enviadoEm;S.enviadoPara=v.enviadoPara}}
+      }catch(e){erro=e;if(e.servidor){it.erro=e.message;await DB.put("fila",it)}break}
+    }
+  }finally{processando=false}
+  await indicador();
+  return {enviados,erro};
+}
+async function aoVoltarInternet(){
+  await indicador();
+  const r=await processarFila();
+  if(tela==="capa")renderCapa();
+  if(r&&r.enviados){if(tela==="form"&&step===STEPS.length-1){setStatus("ok","<b>"+r.enviados+" relatório"+(r.enviados>1?"s enviados":" enviado")+"</b> automaticamente ao voltar a internet.");}render(true)}
+}
+window.addEventListener("online",aoVoltarInternet);
+window.addEventListener("offline",()=>{indicador();if(tela==="capa")renderCapa()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")aoVoltarInternet()});
+
+/* ---------- minhas visitas ---------- */
+async function novaVisita(){await salvarAgora();S=normaliza(blank());lastStatus=null;step=0;tela="form";await salvarAgora();render()}
+async function abrirVisita(id){await salvarAgora();const v=await DB.get("visitas",id);if(!v)return;S=normaliza(v);lsSet("vt_atual",S.id);lastStatus=null;step=0;tela="form";render()}
+async function duplicarVisita(id){const v=await DB.get("visitas",id);if(!v)return;const c=normaliza(JSON.parse(JSON.stringify(v)));c.id=uid();c.status="rascunho";c.exemplo=false;delete c.enviadoEm;delete c.enviadoPara;c.criadoEm=new Date().toISOString();c.visita.cliente=(c.visita.cliente||"Visita")+" (cópia)";await DB.put("visitas",c);render(true)}
+function pedirExclusao(b){const id=b.dataset.exc;const box=document.createElement("div");box.className="note warn";box.innerHTML=`<b>Excluir esta visita deste aparelho?</b><div class="row" style="margin-top:6px"><button class="btn primary" type="button" data-excok="${id}">Sim, excluir</button><button class="btn" type="button" id="excNao">Manter</button></div>`;b.closest(".vrow").replaceWith(box)}
+async function excluirVisita(id){
+  await DB.del("visitas",id);
+  for(const f of await DB.all("fila"))if(f.visitaId===id)await DB.del("fila",f.id);
+  if(S&&S.id===id){const all=await DB.all("visitas");S=all.length?normaliza(all.sort((a,b)=>(b.atualizadoEm||"").localeCompare(a.atualizadoEm||""))[0]):normaliza(blank());await salvarAgora()}
+  await indicador();render(true);
+}
+async function renderLista(keepScroll){
+  const m=document.getElementById("main");
+  let all=[],fila=[];try{all=await DB.all("visitas");fila=await DB.all("fila")}catch(e){}
+  all.sort((a,b)=>(b.atualizadoEm||"").localeCompare(a.atualizadoEm||""));
+  const emFila=new Set(fila.map(f=>f.visitaId));const errFila=Object.fromEntries(fila.filter(f=>f.erro).map(f=>[f.visitaId,f.erro]));
+  const pill=v=>emFila.has(v.id)?(errFila[v.id]?`<span class="pill err">Erro no envio</span>`:`<span class="pill warn">Aguardando internet</span>`):v.status==="enviada"?`<span class="pill ok">Enviada em ${fmtDH(v.enviadoEm)}</span>`:`<span class="pill">Rascunho</span>`;
+  m.innerHTML=`<div class="step-enter"><div class="stephead"><h2>Minhas visitas</h2><p>Tudo fica guardado neste aparelho, mesmo sem internet.</p></div><div class="stack">
+    <button class="btn primary" type="button" id="lNova">+ Nova visita</button>
+    ${fila.length?`<div class="note ${Object.keys(errFila).length?"err":"warn"}"><b>${fila.length} envio${fila.length>1?"s":""} na fila.</b><span>${Object.keys(errFila).length?esc(Object.values(errFila)[0]):navigator.onLine?"Toque em tentar agora ou aguarde.":"Será enviado quando a internet voltar."}</span><div class="row" style="margin-top:6px"><button class="btn" type="button" id="filaAgora"${navigator.onLine?"":" disabled"}>Tentar enviar agora</button></div></div>`:""}
+    ${all.map(v=>{const t=(v.postos||[]).reduce((s,p)=>s+num(p.qtd)*((p.colab!=null&&String(p.colab).trim()!=="")?num(p.colab):(ESCALAS[p.escala]??1)),0);
+      return `<div class="vcard"${S&&S.id===v.id?' style="border-color:var(--brand)"':""}>
+      <div class="vrow" style="justify-content:space-between"><h3>${esc(v.visita?.cliente||"Sem cliente")}${v.visita?.unidade?" · "+esc(v.visita.unidade):""}</h3>${pill(v)}</div>
+      <div class="vmeta">${esc([v.visita?.cidade,v.visita?.uf].filter(Boolean).join("/")||"Local não informado")} · visita em ${fmtData(v.visita?.data)||"—"}${v.quadro?.origem==="Edital"?" · quadro por edital":t?` · efetivo ${fmtN(t)}`:""}${v.exemplo?" · exemplo":""}</div>
+      <div class="vrow"><button class="btn brand" type="button" data-abrir="${v.id}">Abrir</button><button class="btn" type="button" data-dup="${v.id}">Duplicar</button><button class="btn ghost" type="button" data-exc="${v.id}">Excluir</button></div>
+    </div>`}).join("")||`<div class="note info">Nenhuma visita salva ainda.</div>`}
+  </div></div>`;
+  if(!keepScroll)window.scrollTo(0,0);
+}
+async function renderCapa(){
+  const el=document.getElementById("capa");
+  let nV=0,nE=0,nF=0;try{const all=await DB.all("visitas");nV=all.filter(v=>!v.exemplo).length;nE=all.filter(v=>v.status==="enviada"&&!v.exemplo).length;nF=(await DB.all("fila")).length}catch(e){}
+  const atual=S&&!S.exemplo&&S.status!=="enviada"&&(S.visita.cliente||S.postos.length||S.areas.length)?S:null;
+  el.innerHTML=`<div class="capa"><div class="capa-in">
+    <div class="capa-logo"><img src="${LOGO}" alt="Verzani & Sandrini"></div>
+    <div><h1>Visita<br><em>Técnica</em></h1><p class="tag">Levantamento de pré-proposta para limpeza, portaria, vigilância e manutenção.</p></div>
+    <div class="faixa"><i></i><b></b></div>
+    <div class="capa-stats"><div><b>${nV}</b><span>Visitas</span></div><div><b>${nE}</b><span>Enviadas</span></div><div><b>${nF}</b><span>Na fila</span></div></div>
+    ${!navigator.onLine?`<div class="note warn" style="margin:0">Sem internet. Você pode preencher normalmente, o envio sai quando a conexão voltar.</div>`:""}
+    <div class="capa-acoes">
+      <button class="btn primary" type="button" id="cNova">+ Nova visita</button>
+      ${atual?`<button class="btn claro" type="button" id="cContinuar">Continuar visita<small>${esc(atual.visita.cliente||"Sem cliente")} · ${fmtData(atual.visita.data)}</small></button>`:""}
+      <div class="lado"><button class="btn claro" type="button" id="cVisitas">Minhas visitas</button><button class="btn claro" type="button" id="cAjustes">Ajustes</button></div>
+    </div>
+    <p class="capa-rod">Desenvolvedor: Luciano Evaristo · Versão ${APP_VERSAO}</p>
+  </div></div>`;
+  window.scrollTo(0,0);
+}
+function renderConfig(keepScroll){
+  const m=document.getElementById("main");
+  m.innerHTML=`<div class="step-enter"><div class="stephead"><h2>Ajustes</h2><p>Configure uma vez o serviço que envia os e-mails e os destinatários padrão.</p></div><div class="stack">
+    <h3 class="sec-title">Serviço de envio</h3>
+    <div class="card">
+      ${fld("Endereço do serviço (Apps Script)",`<input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" value="${esc(CFG.url)}" autocomplete="off">`)}
+      ${fld("Chave",`<input id="cfgChave" type="text" placeholder="A mesma chave escrita no Apps Script" value="${esc(CFG.chave)}" autocomplete="off">`)}
+      ${fld("Nome do remetente",`<input id="cfgRem" type="text" value="${esc(CFG.remetente||"")}" autocomplete="off">`)}
+      <div class="row"><button class="btn brand" type="button" id="cfgSalvar">Salvar ajustes</button><button class="btn" type="button" id="cfgTestar">Testar conexão</button></div>
+      <div id="status" role="status" aria-live="polite">${lastStatus?`<div class="note ${lastStatus.k}">${lastStatus.h}</div>`:""}</div>
+    </div>
+    <h3 class="sec-title">Destinatários cadastrados</h3>
+    <div class="card" style="gap:0">
+      ${CFG.dest.map((d,i)=>`<div class="rcpt"><label><input type="checkbox" data-dest="${i}"${d.on?" checked":""}><span class="who"><b>${esc(d.nome||d.email)}</b><small>${esc(d.email)}</small></span></label><button class="btn ghost" type="button" data-deldest="${i}" aria-label="Remover ${esc(d.email)}">Remover</button></div>`).join("")||`<p class="muted">Nenhum e-mail cadastrado.</p>`}
+      <div class="row" style="padding-top:12px"><input id="newDestNome" placeholder="Nome (opcional)"><input id="newDestEmail" type="email" placeholder="email@empresa.com.br"><button class="btn" type="button" id="addDest" style="flex:0 0 auto">Cadastrar</button></div>
+    </div>
+    <div class="note info">Os marcados recebem todas as visitas. Na hora de enviar você ainda pode desmarcar ou incluir outros.</div>
+    <h3 class="sec-title">Sobre</h3>
+    <div class="card"><div>Visita Técnica · Verzani & Sandrini<br><span class="muted">Desenvolvedor: Luciano Evaristo · Versão ${APP_VERSAO}</span></div></div>
+    <button class="btn" type="button" id="voltarForm">Voltar para a visita</button>
+  </div></div>`;
+  if(!keepScroll)window.scrollTo(0,0);
+}
+function lerAjustes(){CFG.url=document.getElementById("cfgUrl").value.trim();CFG.chave=document.getElementById("cfgChave").value.trim();CFG.remetente=document.getElementById("cfgRem").value.trim();salvaCfg()}
+function salvarAjustes(){lerAjustes();setStatus("ok","Ajustes salvos.");processarFila()}
+async function testarEnvio(){
+  lerAjustes();
+  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(CFG.url)){setStatus("err","Cole o endereço completo da implantação, que começa com https://script.google.com/macros/s/ e termina com /exec.");return}
+  if(!CFG.chave){setStatus("err","Preencha a chave.");return}
+  if(!navigator.onLine){setStatus("warn","Sem internet agora. Teste quando estiver conectado.");return}
+  setStatus("info","Testando…");
+  try{const j=await chamarServico({acao:"teste"});setStatus("ok","<b>Conexão funcionando.</b> Os e-mails vão sair da conta "+esc(j.conta||"Google configurada")+(j.cota!=null?" (pode enviar mais "+j.cota+" hoje).":"."));processarFila()}
+  catch(e){setStatus("err",esc(e.message))}
+}
+document.getElementById("dl-cargos").innerHTML=CARGOS.map(c=>`<option value="${esc(c)}">`).join("");
+document.getElementById("dl-equip").innerHTML=EQUIP.map(c=>`<option value="${esc(c)}">`).join("");
+(async function boot(){
+  try{
+    const id=lsGet("vt_atual");let v=id?await DB.get("visitas",id):null;
+    if(!v){const all=await DB.all("visitas");if(all.length){all.sort((a,b)=>(b.atualizadoEm||"").localeCompare(a.atualizadoEm||""));v=all[0]}else{v=exemplo()}}
+    S=normaliza(v);await salvarAgora();
+  }catch(e){S=normaliza(exemplo())}
+  render();indicador();processarFila();
+  if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+})();
+window.addEventListener("pagehide",()=>{salvarAgora()});
+</script>
+</body>
+</html>
