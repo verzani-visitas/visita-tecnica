@@ -239,7 +239,7 @@ function blank(){
 }
 function exemplo(){
   const s=blank(); s.exemplo=true;
-  Object.assign(s.visita,{cliente:"DHL Extrema",unidade:"Matriz",endereco:"Rod. Fernão Dias, km 947",cidade:"Extrema",uf:"MG",segmento:"Logística / CD",servicos:["Limpeza"],respComercial:"Mario Ataide",tecnico:"Luciano Evaristo",contatoNome:"Responsável de Facilities",contatoCargo:"Facilities",areaTotal:"11.130",funcionamento:"Seg a sex, 06h às 22h",fornecedorAtual:"",motivo:"Implantação nova",inicio:""});
+  Object.assign(s.visita,{cliente:"DHL Extrema",unidade:"Matriz",endereco:"Rod. Fernão Dias, km 947",cidade:"Extrema",uf:"MG",segmento:"Logística / CD",servicos:["Limpeza"],respComercial:"Mario Ataide",tecnico:"Técnico responsável",contatoNome:"Responsável de Facilities",contatoCargo:"Facilities",areaTotal:"11.130",funcionamento:"Seg a sex, 06h às 22h",fornecedorAtual:"",motivo:"Implantação nova",inicio:""});
   s.areas=[
     {id:uid(),nome:"Escritório administrativo",tipo:"Escritório",m2:"1.200",piso:"Porcelanato",freq:"Diária",fluxo:"Médio",altura:false,obs:"Estações de trabalho e 3 salas de reunião.",fotos:[]},
     {id:uid(),nome:"Sanitários e vestiários",tipo:"Sanitário",m2:"180",piso:"Cerâmica",freq:"2x ao dia ou mais",fluxo:"Alto",altura:false,obs:"Uso coletivo dos turnos da operação.",fotos:[]},
@@ -270,7 +270,7 @@ function exemplo(){
   return s;
 }
 let S=null;
-let CFG = lsGet(LS_CFG) || {dest:[{email:"rodrigo.nunes@verzani.com.br",nome:"Rodrigo Nunes",on:true},{email:"luciano.evaristo@verzani.com.br",nome:"Luciano Evaristo",on:false}],url:"https://script.google.com/macros/s/AKfycbydjtlxUBEtyA2DWN-5Rx6lqIr9iJtb9PCgQleBl-rOfjZ8yFZqxzmES2u5Ze7R3gU/exec",chave:"",remetente:"Visita Técnica · Luciano Evaristo"};
+let CFG = lsGet(LS_CFG) || {dest:[{email:"rodrigo.nunes@verzani.com.br",nome:"Rodrigo Nunes",on:true},{email:"luciano.evaristo@verzani.com.br",nome:"Luciano Evaristo",on:false}],url:"https://script.google.com/macros/s/AKfycbydjtlxUBEtyA2DWN-5Rx6lqIr9iJtb9PCgQleBl-rOfjZ8yFZqxzmES2u5Ze7R3gU/exec",chave:"",remetente:"Visita Técnica"};
 function salvaCfg(){lsSet(LS_CFG,CFG)}
 function normaliza(x){
   const b=blank();

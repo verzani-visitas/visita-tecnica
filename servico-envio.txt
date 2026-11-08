@@ -1,0 +1,66 @@
+/**
+ * Visita Técnica · serviço de envio de e-mail
+ * Desenvolvedor: Luciano Evaristo · Versão 1.0
+ *
+ * ANTES DE SALVAR: troque COLOQUE-AQUI-SUA-CHAVE (linha da CHAVE) pela sua chave.
+ * Use a mesma chave depois em Ajustes no app.
+ *
+ * Recebe o relatório do app e envia por e-mail, com o PDF e a planilha anexados,
+ * a partir da conta Google que publicou este script.
+ *
+ * IMPORTANTE: a CHAVE abaixo precisa ser idêntica à chave digitada em Ajustes no app.
+ * Não compartilhe esta chave. Se ela vazar, troque aqui e no app.
+ */
+const CHAVE = 'COLOQUE-AQUI-SUA-CHAVE';
+
+function doPost(e) {
+  try {
+    const d = JSON.parse(e.postData.contents);
+    if (d.token !== CHAVE) {
+      return resposta({ ok: false, erro: 'Chave inválida. A chave em Ajustes precisa ser igual à do Apps Script.' });
+    }
+
+    if (d.acao === 'teste') {
+      return resposta({ ok: true, conta: Session.getEffectiveUser().getEmail(), cota: MailApp.getRemainingDailyQuota() });
+    }
+
+    if (d.acao === 'enviar') {
+      const para = (d.para || []).filter(Boolean);
+      if (!para.length) return resposta({ ok: false, erro: 'Nenhum destinatário informado.' });
+
+      const anexos = (d.anexos || []).map(a =>
+        Utilities.newBlob(Utilities.base64Decode(a.base64), a.tipo, a.nome)
+      );
+
+      const msg = {
+        to: para.join(','),
+        subject: d.assunto || 'Visita técnica',
+        body: d.texto || '',
+        htmlBody: d.html || '',
+        attachments: anexos,
+        name: d.nome || 'Visita Técnica'
+      };
+      if (d.cc && d.cc.length) msg.cc = d.cc.join(',');
+
+      MailApp.sendEmail(msg);
+      return resposta({ ok: true, cota: MailApp.getRemainingDailyQuota() });
+    }
+
+    return resposta({ ok: false, erro: 'Ação desconhecida.' });
+  } catch (err) {
+    return resposta({ ok: false, erro: String(err && err.message || err) });
+  }
+}
+
+function doGet() {
+  return resposta({ ok: true, servico: 'Visita Técnica', versao: '1.0' });
+}
+
+function resposta(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+/** Rode esta função uma vez pelo editor para autorizar o envio de e-mails. */
+function autorizar() {
+  Logger.log('Envios restantes hoje: ' + MailApp.getRemainingDailyQuota());
+}
